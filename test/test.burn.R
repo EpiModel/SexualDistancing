@@ -1,7 +1,7 @@
 
 rm(list = ls())
-# suppressMessages(library("EpiModelHIV"))
-devtools::load_all("~/Dropbox/Dev/EpiModelHIV/EpiModelHIV-p")
+suppressMessages(library("EpiModelHIV"))
+## devtools::load_all("~/Dropbox/Dev/EpiModelHIV/EpiModelHIV-p")
 
 netstats <- readRDS("est/netstats.rda")
 epistats <- readRDS("est/epistats.rda")

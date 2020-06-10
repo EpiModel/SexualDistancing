@@ -6,15 +6,15 @@
 install.packages("EpiModel")
 
 # Extra Helper Packages
-install.packages(c("remotes", "sessioninfo"))
+install.packages(c("remotes", "sessioninfo", "ergm", "tergm"))
 
 # Latest Dev Versions of Statnet Packages
-remotes::install_github(c("statnet/network@deff2a0",
-                          "statnet/networkDynamic@14182bf",
-                          "statnet/statnet.common@3307a8c",
-                          "statnet/ergm@8b30e92",
-                          "statnet/tergm@d3af135"),
-                        upgrade = FALSE)
+## remotes::install_github(c("statnet/network@deff2a0",
+##                           "statnet/networkDynamic@14182bf",
+##                           "statnet/statnet.common@3307a8c",
+##                           "statnet/ergm@8b30e92",
+##                           "statnet/tergm@d3af135"),
+##                         upgrade = FALSE)
 
 # Latest Dev Versions of EpiModel Packages
 remotes::install_github(c("statnet/EpiModel@2c131f0",
