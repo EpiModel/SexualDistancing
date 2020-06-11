@@ -30,6 +30,12 @@ remotes::install_github("EpiModel/EpiModelHIV-p@CombPrev",
                         upgrade = FALSE)
 
 
+remotes::install_github(c(
+  "EpiModel/EpiModelHIV-p@CombPrev-2.0",
+  "EpiModel/ARTnetData",
+  "EpiModel/ARTnet"
+))
+
 # Package Listing ---------------------------------------------------------
 
 library("EpiModelHIV")
