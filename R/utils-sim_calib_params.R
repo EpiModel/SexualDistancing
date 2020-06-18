@@ -1,5 +1,5 @@
-#library(EpiModelHIV)
-devtools::load_all("../EpiModelHIV-p/")
+library(EpiModelHIV)
+#devtools::load_all("../EpiModelHIV-p/")
 
 orig <- readRDS("out/est/netest.rds")
 netstats <- readRDS("out/est/netstats.rds")
