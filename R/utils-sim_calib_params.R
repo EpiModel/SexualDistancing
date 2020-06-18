@@ -1,4 +1,5 @@
-library(EpiModelHIV)
+#library(EpiModelHIV)
+devtools::load_all("../EpiModelHIV-p/")
 
 orig <- readRDS("out/est/netest.rds")
 netstats <- readRDS("out/est/netstats.rds")
@@ -41,7 +42,42 @@ param <- param_msm(
   ## prep.sti.screen.int = 182/7,
   ## prep.sti.prob.tx = 1,
   prep.risk.reassess.method = "year",
-  prep.require.lnt = TRUE # FALSE -> start with random PrEP initiation
+  prep.require.lnt = TRUE, # FALSE -> start with random PrEP initiation
+
+  ## STI PARAMS (default: from combprev2, make it gaps)
+  ## Using values in prep-race: scripts/burnin/sim.burn.R
+  ## If not mentionned -> default from prep disparities
+  ## for H : mean(c(B, W))
+  #ok
+  rgc.tprob = 0.357,  # gaps appendix 9.4
+  ugc.tprob = 0.248,  # gaps appendix 9.4
+  rct.tprob = 0.3216, # gaps appendix 9.3
+  uct.tprob = 0.213,  # gaps appendix 9.3
+  rgc.sympt.prob = 0.077, # gaps appendix 10.3
+  ugc.sympt.prob = 0.824, # gaps appendix 10.3
+  rct.sympt.prob = 0.1035,# gaps appendix 10.2
+  uct.sympt.prob = 0.885, # gaps appendix 10.2
+  rgc.ntx.int = 35.11851, # gaps appendix 11.2
+  ugc.ntx.int = 35.11851, # gaps appendix 11.2
+  gc.tx.int   = 2, # gaps appendix 11.2 - mentionned, not explicit
+  rct.ntx.int = 44.24538, # gaps appendix 11.1
+  uct.ntx.int = 44.24538, # gaps appendix 11.1
+  ct.tx.int   = 2, # gaps appendix 11.1 - mentionned, not explicit
+
+  gc.sympt.prob.tx = c(0.86, 0.91, 0.96),
+  ct.sympt.prob.tx = c(0.72, 0.785, 0.85),
+  gc.asympt.prob.tx = c(0.10, 0.145, 0.19),
+  ct.asympt.prob.tx = c(0.05, 0.525, 0.10),
+  # gaps appendix 9.3 - 9.4 (not explained this way but similar result)
+  sti.cond.eff = 0.95,
+  sti.cond.fail = c(0.39, 0.3, 0.21),
+  # gaps appendix 9.2
+  hiv.rgc.rr = 2.78,
+  hiv.ugc.rr = 1.73,
+  hiv.rct.rr = 2.78,
+  hiv.uct.rr = 1.73,
+ # if both ct + gc -> log(RRgc) + 0.2 * log(RRct) | swap ct and gc if RRct > RRgc
+  hiv.dual.rr = 0.2 # not mentionned in appendix
 )
 
 ## must be set by the calling script
