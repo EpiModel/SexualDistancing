@@ -5,7 +5,7 @@ library(EpiABC)
 
 # Try to create the "abc" folder. If it exists, throw an error
 source("R/utils-ABC.R")
-create_abc_folder()#force = TRUE)
+create_abc_folder(force = TRUE)
 
 # Main Model Fx -----------------------------------------------------------
 
@@ -15,10 +15,10 @@ f <- function(x) {
 
   control <- control_msm(
     nsteps = 52 * 65,
-    nsims = 28,
-    ncores = 28,
-    save.nwstats = FALSE,
-    save.clin.hist = FALSE,
+    ## nsims = 3,
+    ## ncores = 3,
+    ## save.nwstats = FALSE,
+    ## save.clin.hist = FALSE,
     verbose = FALSE
   )
 
@@ -74,7 +74,23 @@ f <- function(x) {
   ir100.sti.H <- mean(tail(df[["ir100.sti.H"]], 52), na.rm = T)
   ir100.sti.W <- mean(tail(df[["ir100.sti.W"]], 52), na.rm = T)
 
-  c(i.prev, ir100.gc, ir100.ct, ir100.sti.B, ir100.sti.H, ir100.sti.W)
+  ## thresh <- control$nsteps - 52
+  ## i.prev <- colMeans(df[df$time > thresh, c("i.prev.B", "i.prev.H", "i.prev.W")])
+  ## ir100.gc <- mean(df[df$time > thresh,][["ir100.gc"]], na.rm = T)
+  ## ir100.ct <- mean(df[df$time > thresh,][["ir100.ct"]], na.rm = T)
+  ## ir100.sti.B <- mean(df[df$time > thresh,][["ir100.sti.B"]], na.rm = T)
+  ## ir100.sti.H <- mean(df[df$time > thresh,][["ir100.sti.H"]], na.rm = T)
+  ## ir100.sti.W <- mean(df[df$time > thresh,][["ir100.sti.W"]], na.rm = T)
+
+  p <- c(i.prev, ir100.gc, ir100.ct, ir100.sti.B, ir100.sti.H, ir100.sti.W)
+  names(p) <- c("i.prev.B", "i.prev.H", "i.prev.W",
+                "ir100.gc", "ir100.ct",
+                "ir100.sti.B", "ir100.sti.H", "ir100.sti.W")
+
+  p
+  print(p)
+
+  df
 }
 
 # ABC Priors and Target Stats ---------------------------------------------
@@ -120,30 +136,31 @@ ir100.sti.W <- 2.4
 
 targets <- c(i.prev, ir100.gc, ir100.ct, ir100.sti.B, ir100.sti.H, ir100.sti.W)
 
-## # test before run
+# test before run
 ## x <- c(1, vapply(
 ##   priors,
 ##   function(x) runif(1, as.numeric(x[2]), as.numeric(x[3])),
 ##   1
 ## ))
 
-## f(x)
+## df <- f(x)
+
 # Run ABC Prep ------------------------------------------------------------
 
 prep <- abc_smc_prep(
   model = f,
   prior = priors,
-  nsims = 400,
+  nsims = 420,
   summary_stat_target = targets,
   ncores = 28,
-  alpha = 0.3
+  alpha = 0.1
 )
 
 saveRDS(prep, file = "abc/data/abc.prep.rds")
 
 sbatch_master_abc(
   prep,
-  nwaves = 10,
+  nwaves = 2,
   master.file = "abc/master.sh",
   runsim.file = "abc/runsim.sh",
   mem = "150G",
