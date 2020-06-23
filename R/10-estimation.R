@@ -39,7 +39,7 @@ if (! file.exists("out/est/netstats.rds")) {
     epistats,
     netparams,
     expect.mort = 0.000478213, # default is 0.000478213
-    network.size = 10000,      # default is 10000
+    network.size = 25000,      # default is 10000
     browser = FALSE,           # default is FALSE
     edges.avg = FALSE          # default is FALSE
   )

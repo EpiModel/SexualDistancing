@@ -3,7 +3,7 @@ lnt <- TRUE # if FALSE: set `require.lnt` to FALSE and adjust ` prep.start.prob`
 source("R/utils-sim_calib_params.R")
 
 control <- control_msm(
-  nsteps = 52 * 5,
+  nsteps = 52 * 65,
   nsims = 1,
   ncores = 1,
   save.nwstats = FALSE,
@@ -23,6 +23,13 @@ init <- init_msm(
   prev.rct = 0.015,
   prev.rgc = 0.015,
   prev.uct = 0.015
+)
+
+init <- init_msm(
+  prev.ugc = 0,
+  prev.rct = 0,
+  prev.rgc = 0,
+  prev.uct = 0
 )
 
 sim <- netsim(orig, param, init, control)
@@ -79,3 +86,23 @@ ggplot(df, aes(x = time, y = tot.tests)) +
 # diags
 ggplot(df, aes(x = time, y = cc.dx)) +
   geom_line()
+
+targets <- c(
+  # CombPrev appendix 8.2.2
+  i.prev.dx.B = 0.33,
+  i.prev.dx.H = 0.127,
+  i.prev.dx.W = 0.084,
+  #prep_prop = 0.15,
+  # google sheet: https://docs.google.com/spreadsheets/d/1GWFrDqvTpdK24f6Lzqg3xdzCobbvOXj7Bpalq7xLUX4/edit?ts=5defba8b#gid=0
+  cc.dx.B = 0.804,
+  cc.dx.H = 0.799,
+  cc.dx.W = 0.88,
+  cc.linked1m.B = 0.62,
+  cc.linked1m.H = 0.65,
+  cc.linked1m.W = 0.76,
+  cc.vsupp.B = 0.55,
+  cc.vsupp.H = 0.60,
+  cc.vsupp.W = 0.72
+)
+
+tail(df[, names(targets)], 1)
