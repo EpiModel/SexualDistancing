@@ -13,6 +13,9 @@ f <- function(x) {
   lnt <- TRUE # if FALSE: set `require.lnt` to FALSE and adjust ` prep.start.prob`
   source("R/utils-sim_calib_params.R", local = TRUE)
 
+  logit <- function(p) log(p / (1 - p))
+  logistic <- function(p) 1 / (1 + exp(-p))
+
   control <- control_msm(
     nsteps = 52 * 68,
     ## nsims = 3,
@@ -31,15 +34,34 @@ f <- function(x) {
 
   set.seed(x[1])
 
-  param$rgc.tprob <- x[2]
-  param$ugc.tprob <- x[3]
-  param$rct.tprob <- x[4]
-  param$uct.tprob <- x[5]
-  param$rgc.ntx.int <- x[6]
-  param$ugc.ntx.int <- x[7]
-  param$rct.ntx.int <- x[8]
-  param$uct.ntx.int <- x[9]
-  ## param$gc.tx.int <- x[12]
+  # For gc and ct, I use a OR of 1.25 for R vs U infection. This is based on
+  # prep disparities apdx 9.3, 9.4 with baseline 0.35, 0.4 and 0.32, 0.4 for GC
+  # and CT. (35 and 4 are mean of intervall),
+  # I have no info in the targets to distinguish U to R. So no reason to have 2 params
+  param$ugc.tprob <- x[2]
+  param$rgc.tprob <- logistic(logit(x[2]) + log(1.25))
+  param$uct.tprob <- x[3]
+  param$rct.tprob <- logistic(logit(x[3]) + log(1.25))
+
+  # Same duration for U and R, as in prep disp
+  param$rgc.ntx.int <- x[4]
+  param$ugc.ntx.int <- x[4]
+  param$rct.ntx.int <- x[5]
+  param$uct.ntx.int <- x[5]
+
+  ## # One base sympt * OR U>R using apdx 10.2, 10.3
+  ## # exp(logit(0.9) - logit(0.16)) = 47.25
+  ## # exp(logit(0.58) - logit(0.14)) = 8.5
+  ## param$rgc.sympt.prob <- x[6]
+  ## param$ugc.sympt.prob <- logistic(logit(x[6]) + log(47.25))
+  ## param$rct.sympt.prob <- x[7]
+  ## param$uct.sympt.prob <- logistic(logit(x[7]) + log(8.5))
+
+  ## param$gc.sympt.prob.tx  <- x[10:12]
+  ## param$ct.sympt.prob.tx  <- x[13:15]
+  ## param$gc.asympt.prob.tx <- x[16:18]
+  ## param$ct.asympt.prob.tx <- x[19:21]
+  ## ## param$gc.tx.int <- x[12]
   ## param$ct.tx.int <- x[15]
 #   param$trans.scale  <- x[6:8]
   ## param$rgc.sympt.prob <- x[6]
@@ -50,10 +72,6 @@ f <- function(x) {
   ## ## # gaps appendix 9.3 - 9.4 (not explained this way but similar result)
   ## param$sti.cond.eff <- x[16]
   ## param$sti.cond.fail <- x[17:19]
-  ## param$gc.sympt.prob.tx  <- x[20:22]
-  ## param$ct.sympt.prob.tx  <- x[23:25]
-  ## param$gc.asympt.prob.tx <- x[26:28]
-  ## param$ct.asympt.prob.tx <- x[29:31]
 
   # gaps appendix 9.2
  ##  param$hiv.rgc.rr <- x[18]
@@ -74,9 +92,9 @@ f <- function(x) {
   ir100.ct <- mean(tail(df[["ir100.ct"]], 52*3), na.rm = T)
 
 
-  ir100.sti.B <- mean(tail(df[["ir100.sti.B"]], 52*3), na.rm = T) / ir100.sti
-  ir100.sti.H <- mean(tail(df[["ir100.sti.H"]], 52*3), na.rm = T) / ir100.sti
-  ir100.sti.W <- mean(tail(df[["ir100.sti.W"]], 52*3), na.rm = T) / ir100.sti
+  ir100.sti.B <- mean(tail(df[["ir100.sti.B"]], 52*3), na.rm = T)
+  ir100.sti.H <- mean(tail(df[["ir100.sti.H"]], 52*3), na.rm = T)
+  ir100.sti.W <- mean(tail(df[["ir100.sti.W"]], 52*3), na.rm = T)
 
   ir100.sti <- ir100.sti.B + ir100.sti.H + ir100.sti.W
 
@@ -86,10 +104,14 @@ f <- function(x) {
 
   p <- c(
     ## i.prev,
-    ir100.gc, ir100.ct, ir100.sti.B, ir100.sti.H, ir100.sti.W)
+    ir100.gc, ir100.ct#,
+    ## ir100.sti.B, ir100.sti.H, ir100.sti.W
+  )
   names(p) <- c(
     ## "i.prev.B", "i.prev.H", "i.prev.W",
-    "ir100.gc", "ir100.ct", "ir100.sti.B", "ir100.sti.H", "ir100.sti.W")
+    "ir100.gc", "ir100.ct"#,
+    ## "ir100.sti.B", "ir100.sti.H", "ir100.sti.W"
+  )
 
   p
 }
@@ -97,15 +119,27 @@ f <- function(x) {
 # ABC Priors and Target Stats ---------------------------------------------
 
 priors <- list(
-  c("unif", .10, .6),   # rgc.tprob
-  c("unif", .10, .6),   # ugc.tprob
-  c("unif", .10, .6),   # rct.tprob
-  c("unif", .10, .6),   # uct.tprob
-  c("unif", 26, 52),   # rgc.ntx.int
-  c("unif", 26, 52),   # ugc.ntx.int
-  c("unif", 39, 65),   # rct.ntx.int
-  c("unif", 39, 65)#,   # uct.ntx.int
-  ## c("unif", 1, 15),   # gc.tx.int
+  c("unif", .15, .4),     # ugc.tprob (before, 0.1 - 0.6)
+  ## c("unif", .10, .6),  # rgc.tprob - now with 1.25 OR
+  c("unif", .15, .4),     # uct.tprob
+  ## c("unif", .10, .6),  # rct.tprob - now with 1.25 OR
+  c("unif", 20, 52),      # rgc.ntx.int  (before 26 - 52)
+  ## c("unif", 26, 52),   # ugc.ntx.int- now U and R same duration
+  c("unif", 33, 65)       # rct.ntx.int (before 39 - 65)
+  ## ## c("unif", 39, 65)    # uct.ntx.int - now U and R same duration
+  ## c("unif", .01, .2),    # rgc.sympt.prob
+  ## ## c("unif", .6, .95),  # ugc.sympt.prob - now with OR 47.25
+  ## c("unif", .01, .4)     # rct.sympt.prob
+  ## ## c("unif", .6, .95),  # uct.sympt.prob - now with OR 8.5
+)
+## priors <- c(
+##   priors,
+##   as.list(rep(list(c("unif", .8, 1)), 3)),    # gc.sympt.prob.tx
+##   as.list(rep(list(c("unif", .8, 1)), 3)),    # ct.sympt.prob.tx
+##   as.list(rep(list(c("unif", .01, .25)), 3)), # gc.asympt.prob.tx
+##   as.list(rep(list(c("unif", .01, .25)), 3))  # ct.asympt.prob.tx
+## )
+##   ## c("unif", 1, 15),   # gc.tx.int
   ## c("unif", 1, 15),   # ct.tx.int
   
   ## c("unif", 1, 4),   # trans.scale.B
@@ -122,7 +156,7 @@ priors <- list(
   ## c("unif", .5, .8),   # hiv.rct.rr
   ## c("unif", .5, .8),   # hiv.uct.rr
   ## c("unif", .5, .8),   # hiv.dual.rr
-)
+
 ## priors <- c(
 ##   priors,
 ##   as.list(rep(list(c("unif", .1, .5)), 3)),  # sti.cond.fail
@@ -148,7 +182,9 @@ ir100.sti.W <- ir100.sti.W / ir100.sti
 
 targets <- c(
   # i.prev,
-  ir100.gc, ir100.ct, ir100.sti.B, ir100.sti.H, ir100.sti.W)
+  ir100.gc, ir100.ct#,
+  ## ir100.sti.B, ir100.sti.H, ir100.sti.W
+)
 
 # Run ABC Prep ------------------------------------------------------------
 
