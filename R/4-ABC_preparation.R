@@ -49,13 +49,13 @@ f <- function(x) {
   param$rct.ntx.int <- x[5]
   param$uct.ntx.int <- x[5]
 
-  ## # One base sympt * OR U>R using apdx 10.2, 10.3
-  ## # exp(logit(0.9) - logit(0.16)) = 47.25
-  ## # exp(logit(0.58) - logit(0.14)) = 8.5
-  ## param$rgc.sympt.prob <- x[6]
-  ## param$ugc.sympt.prob <- logistic(logit(x[6]) + log(47.25))
-  ## param$rct.sympt.prob <- x[7]
-  ## param$uct.sympt.prob <- logistic(logit(x[7]) + log(8.5))
+  # One base sympt * OR U>R using apdx 10.2, 10.3
+  # exp(logit(0.9) - logit(0.16)) = 47.25
+  # exp(logit(0.58) - logit(0.14)) = 8.5
+  param$rgc.sympt.prob <- x[6]
+  param$ugc.sympt.prob <- logistic(logit(x[6]) + log(47.25))
+  param$rct.sympt.prob <- x[7]
+  param$uct.sympt.prob <- logistic(logit(x[7]) + log(8.5))
 
   ## param$gc.sympt.prob.tx  <- x[10:12]
   ## param$ct.sympt.prob.tx  <- x[13:15]
@@ -125,12 +125,12 @@ priors <- list(
   ## c("unif", .10, .6),  # rct.tprob - now with 1.25 OR
   c("unif", 20, 52),      # rgc.ntx.int  (before 26 - 52)
   ## c("unif", 26, 52),   # ugc.ntx.int- now U and R same duration
-  c("unif", 33, 65)       # rct.ntx.int (before 39 - 65)
-  ## ## c("unif", 39, 65)    # uct.ntx.int - now U and R same duration
-  ## c("unif", .01, .2),    # rgc.sympt.prob
-  ## ## c("unif", .6, .95),  # ugc.sympt.prob - now with OR 47.25
-  ## c("unif", .01, .4)     # rct.sympt.prob
-  ## ## c("unif", .6, .95),  # uct.sympt.prob - now with OR 8.5
+  c("unif", 33, 65),       # rct.ntx.int (before 39 - 65)
+  ## c("unif", 39, 65)    # uct.ntx.int - now U and R same duration
+  c("unif", .01, .2),    # rgc.sympt.prob
+  ## c("unif", .6, .95),  # ugc.sympt.prob - now with OR 47.25
+  c("unif", .01, .4)     # rct.sympt.prob
+  ## c("unif", .6, .95),  # uct.sympt.prob - now with OR 8.5
 )
 ## priors <- c(
 ##   priors,
@@ -225,33 +225,73 @@ nwaves <- 25
 mem <- "150G"
 user <- "aleguil"
 master.file <- "abc/master.sh"
+partition <- "ckpt" #"csde", #"ckpt",
+account <- "csde-ckpt" #"csde", #"csde-ckpt",
+#  n_cpus = 28,
 
 cat("#!/bin/bash", file = master.file)
 cat("\n\n", file = master.file, append = TRUE)
 
 cat(
-  glue("sbatch -p ckpt -A csde-ckpt --array=1-15 --job-name=wave0_{user} --export=ALL,wave=0  --ntasks-per-node=28 --mem={mem} --time=1:00:00 abc/runsim.sh"),
+  glue("w0=$(sbatch -p {partition} -A {account} --array=1-15",
+       " --job-name=wave0_{user} --export=ALL,wave=0  --ntasks-per-node=28",
+       " --mem={mem} --time=1:00:00 abc/runsim.sh)"),
   file = master.file, append = TRUE
 )
 cat("\n", file = master.file, append = TRUE)
 
 cat(
-  glue("sbatch -p ckpt -A csde-ckpt --job-name=process0_{user} --export=ALL,wave=0 --depend=afterany:$(squeue --noheader --Format arrayjobid --name wave0_{user} | uniq) -c 1 --mem=15G --time=1:00:00 abc/runprocess.sh"),
+  glue("p0=$(sbatch -p {partition} -A {account} --job-name=process0_{user}",
+       " --export=ALL,wave=0 --depend=afterany:$w0 -c 1 --mem=15G", 
+       " --time=1:00:00 abc/runprocess.sh)"),
   file = master.file, append = TRUE
-  )
+)
 cat("\n\n", file = master.file, append = TRUE)
 
 
 for (i in seq_len(nwaves)) {
   cat(
-    glue("sbatch -p ckpt -A csde-ckpt --array=1-14 --job-name=wave{i}_{user} --export=ALL,wave={i} --depend=afterany:$(squeue --noheader --Format arrayjobid --name process{i-1}_{user} | uniq) --ntasks-per-node=28 --mem={mem} --time=1:00:00 abc/runsim.sh"),
-         file = master.file, append = TRUE
-         )
-    cat("\n", file = master.file, append = TRUE)
+    glue("w{i}=$(sbatch -p {partition} -A {account} --array=1-14", 
+         " --job-name=wave{i}_{user} --export=ALL,wave={i}", 
+         " --depend=afterany:$p{i-1} --ntasks-per-node=28 --mem={mem}", 
+         " --time=1:00:00 abc/runsim.sh)"),
+    file = master.file, append = TRUE
+  )
+  cat("\n", file = master.file, append = TRUE)
 
-    cat(
-      glue("sbatch -p ckpt -A csde-ckpt --job-name=process{i}_{user} --export=ALL,wave={i} --depend=afterany:$(squeue --noheader --Format arrayjobid --name wave{i}_{user} | uniq) -c 1 --mem=15G --time=1:00:00 abc/runprocess.sh"),
-           file = master.file, append = TRUE
-           )
-      cat("\n\n", file = master.file, append = TRUE)
+  cat(
+    glue("p{i}=$(sbatch -p {partition} -A {account}", 
+         " --job-name=process{i}_{user} --export=ALL,wave={i}", 
+         " --depend=afterany:$w{i} -c 1 --mem=15G --time=1:00:00", 
+         " abc/runprocess.sh)"),
+    file = master.file, append = TRUE
+  )
+  cat("\n\n", file = master.file, append = TRUE)
 }
+
+## cat(
+##   glue("sbatch -p {partition} -A {account} --array=1-15 --job-name=wave0_{user} --export=ALL,wave=0  --ntasks-per-node=28 --mem={mem} --time=1:00:00 abc/runsim.sh"),
+##   file = master.file, append = TRUE
+## )
+## cat("\n", file = master.file, append = TRUE)
+## 
+## cat(
+##   glue("sbatch -p {partition} -A {account} --job-name=process0_{user} --export=ALL,wave=0 --depend=afterany:$(squeue --noheader --Format arrayjobid --name wave0_{user} | uniq) -c 1 --mem=15G --time=1:00:00 abc/runprocess.sh"),
+##   file = master.file, append = TRUE
+##   )
+## cat("\n\n", file = master.file, append = TRUE)
+## 
+## 
+## for (i in seq_len(nwaves)) {
+##   cat(
+##     glue("sbatch -p {partition} -A {account} --array=1-14 --job-name=wave{i}_{user} --export=ALL,wave={i} --depend=afterany:$(squeue --noheader --Format arrayjobid --name process{i-1}_{user} | uniq) --ntasks-per-node=28 --mem={mem} --time=1:00:00 abc/runsim.sh"),
+##          file = master.file, append = TRUE
+##          )
+##     cat("\n", file = master.file, append = TRUE)
+## 
+##     cat(
+##       glue("sbatch -p {partition} -A {account} --job-name=process{i}_{user} --export=ALL,wave={i} --depend=afterany:$(squeue --noheader --Format arrayjobid --name wave{i}_{user} | uniq) -c 1 --mem=15G --time=1:00:00 abc/runprocess.sh"),
+##            file = master.file, append = TRUE
+##            )
+##       cat("\n\n", file = master.file, append = TRUE)
+## }

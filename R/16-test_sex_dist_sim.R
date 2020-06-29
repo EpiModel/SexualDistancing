@@ -3,7 +3,7 @@ lnt <- TRUE # if FALSE: set `require.lnt` to FALSE and adjust ` prep.start.prob`
 source("R/utils-sim_calib_params.R")
 
 control <- control_msm(
-  nsteps = 52 * 65,
+  nsteps = 52 * 5,
   nsims = 1,
   ncores = 1,
   save.nwstats = FALSE,
