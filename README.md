@@ -47,4 +47,18 @@ Once `renv` has finished initializing, restart R.
 To use this model, you will need a GitHub Private Access Token to install 
 packages from private GitHub repositories (EpiModelHIV-p, ARTNetData).
 
+It should be set either in "~/.bashrc":
+
+```
+export GITHUB_PAT="<your github private access token>"
+```
+
+or in "~/.Renviron":
+
+```
+GITHUB_PAT="<your github private access token>"
+
+```
+
+
 
