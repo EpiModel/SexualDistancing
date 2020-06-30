@@ -235,7 +235,7 @@ cat("\n\n", file = master.file, append = TRUE)
 cat(
   glue("w0=$(sbatch -p {partition} -A {account} --array=1-15",
        " --job-name=wave0_{user} --export=ALL,wave=0  --ntasks-per-node=28",
-       " --mem={mem} --time=1:00:00 abc/runsim.sh)"),
+       " --mem={mem} --time=1:00:00 --parsable abc/runsim.sh)"),
   file = master.file, append = TRUE
 )
 cat("\n", file = master.file, append = TRUE)
@@ -243,7 +243,7 @@ cat("\n", file = master.file, append = TRUE)
 cat(
   glue("p0=$(sbatch -p {partition} -A {account} --job-name=process0_{user}",
        " --export=ALL,wave=0 --depend=afterany:$w0 -c 1 --mem=15G", 
-       " --time=1:00:00 abc/runprocess.sh)"),
+       " --time=1:00:00 --parsable abc/runprocess.sh)"),
   file = master.file, append = TRUE
 )
 cat("\n\n", file = master.file, append = TRUE)
@@ -254,7 +254,7 @@ for (i in seq_len(nwaves)) {
     glue("w{i}=$(sbatch -p {partition} -A {account} --array=1-14", 
          " --job-name=wave{i}_{user} --export=ALL,wave={i}", 
          " --depend=afterany:$p{i-1} --ntasks-per-node=28 --mem={mem}", 
-         " --time=1:00:00 abc/runsim.sh)"),
+         " --time=1:00:00 --parsable abc/runsim.sh)"),
     file = master.file, append = TRUE
   )
   cat("\n", file = master.file, append = TRUE)
@@ -263,7 +263,7 @@ for (i in seq_len(nwaves)) {
     glue("p{i}=$(sbatch -p {partition} -A {account}", 
          " --job-name=process{i}_{user} --export=ALL,wave={i}", 
          " --depend=afterany:$w{i} -c 1 --mem=15G --time=1:00:00", 
-         " abc/runprocess.sh)"),
+         " --parsable abc/runprocess.sh)"),
     file = master.file, append = TRUE
   )
   cat("\n\n", file = master.file, append = TRUE)

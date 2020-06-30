@@ -1,0 +1,7 @@
+#!/bin/bash
+
+sbatch -p ckpt -A csde-ckpt --array=1-15 --job-name=wave0_aleguil --export=ALL,wave=0  --ntasks-per-node=28 --mem=150G --time=1:00:00 abc/runsim.sh
+sbatch -p ckpt -A csde-ckpt --job-name=process0_aleguil --export=ALL,wave=0 --depend=afterany:$(squeue --noheader --Format arrayjobid --name wave0_aleguil | uniq) -c 1 --mem=15G --time=1:00:00 abc/runprocess.sh
+
+sbatch -p ckpt -A csde-ckpt --array=1-15 --job-name=wave1_aleguil --export=ALL,wave=1  --depend=afterany:$(squeue --noheader --Format arrayjobid --name process0_aleguil | uniq) --ntasks-per-node=28 --mem=150G --time=1:00:00 abc/runsim.sh
+sbatch -p ckpt -A csde-ckpt --job-name=process0_aleguil --export=ALL,wave=1 --depend=afterany:$(squeue --noheader --Format arrayjobid --name wave1_aleguil | uniq) -c 1 --mem=15G --time=1:00:00 abc/runprocess.sh
