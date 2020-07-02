@@ -3,7 +3,7 @@ library(EpiABC)
 
 ## sims <- readRDS("out/only_rprob/abc.wave5.rda")
 
-out <- get_posterior(wave = 7, input = "out/out")
+out <- get_posterior(wave = 3, input = "out/out")
 summary(out, digits = 3)
 
 boxplot(out, type = "stats")

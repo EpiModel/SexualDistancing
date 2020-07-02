@@ -26,10 +26,10 @@ f <- function(x) {
   )
 
   init <- init_msm(
-    prev.ugc = 0.015,
-    prev.rct = 0.015,
-    prev.rgc = 0.015,
-    prev.uct = 0.015
+    prev.ugc = 0.05,
+    prev.rct = 0.05,
+    prev.rgc = 0.05,
+    prev.uct = 0.05
   )
 
   set.seed(x[1])
@@ -191,10 +191,10 @@ targets <- c(
 prep <- abc_smc_prep(
   model = f,
   prior = priors,
-  nsims = 420,
+  nsims = 840,
   summary_stat_target = targets,
   ncores = 28,
-  alpha = 0.1
+  alpha = 0.2
 )
 
 saveRDS(prep, file = "abc/data/abc.prep.rds")
@@ -211,30 +211,31 @@ saveRDS(prep, file = "abc/data/abc.prep.rds")
 
 
 # test before run
-## x <- c(3, vapply(
-##   priors,
-##   function(x) runif(1, as.numeric(x[2]), as.numeric(x[3])),
-##   1
-## ))
-
-## df <- f(x)
+##x <- c(3, vapply(
+##  priors,
+##  function(x) runif(1, as.numeric(x[2]), as.numeric(x[3])),
+##  1
+##))
+##
+##df <- f(x)
 
 library(glue)
 
-nwaves <- 25
+nwaves <- 10 
 mem <- "150G"
 user <- "aleguil"
 master.file <- "abc/master.sh"
 partition <- "ckpt" #"csde", #"ckpt",
 account <- "csde-ckpt" #"csde", #"csde-ckpt",
-#  n_cpus = 28,
+batchSize <- prep$batchSize
+ncores = prep$ncores
 
 cat("#!/bin/bash", file = master.file)
 cat("\n\n", file = master.file, append = TRUE)
 
 cat(
-  glue("w0=$(sbatch -p {partition} -A {account} --array=1-15",
-       " --job-name=wave0_{user} --export=ALL,wave=0  --ntasks-per-node=28",
+  glue("w0=$(sbatch -p {partition} -A {account} --array=1-{batchSize[1]}",
+       " --job-name=wave0_{user} --export=ALL,wave=0  --ntasks-per-node={ncores}",
        " --mem={mem} --time=1:00:00 --parsable abc/runsim.sh)"),
   file = master.file, append = TRUE
 )
@@ -242,7 +243,7 @@ cat("\n", file = master.file, append = TRUE)
 
 cat(
   glue("p0=$(sbatch -p {partition} -A {account} --job-name=process0_{user}",
-       " --export=ALL,wave=0 --depend=afterany:$w0 -c 1 --mem=15G", 
+       " --export=ALL,wave=0 --depend=afterok:$w0 -c 1 --mem=15G", 
        " --time=1:00:00 --parsable abc/runprocess.sh)"),
   file = master.file, append = TRUE
 )
@@ -251,9 +252,9 @@ cat("\n\n", file = master.file, append = TRUE)
 
 for (i in seq_len(nwaves)) {
   cat(
-    glue("w{i}=$(sbatch -p {partition} -A {account} --array=1-14", 
+    glue("w{i}=$(sbatch -p {partition} -A {account} --array=1-{batchSize[2]}", 
          " --job-name=wave{i}_{user} --export=ALL,wave={i}", 
-         " --depend=afterany:$p{i-1} --ntasks-per-node=28 --mem={mem}", 
+         " --depend=afterok:$p{i-1} --ntasks-per-node={ncores} --mem={mem}", 
          " --time=1:00:00 --parsable abc/runsim.sh)"),
     file = master.file, append = TRUE
   )
@@ -262,7 +263,7 @@ for (i in seq_len(nwaves)) {
   cat(
     glue("p{i}=$(sbatch -p {partition} -A {account}", 
          " --job-name=process{i}_{user} --export=ALL,wave={i}", 
-         " --depend=afterany:$w{i} -c 1 --mem=15G --time=1:00:00", 
+         " --depend=afterok:$w{i} -c 1 --mem=15G --time=1:00:00", 
          " --parsable abc/runprocess.sh)"),
     file = master.file, append = TRUE
   )
