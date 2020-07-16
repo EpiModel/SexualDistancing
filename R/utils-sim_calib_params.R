@@ -64,10 +64,10 @@ param <- param_msm(
   uct.ntx.int = 44.24538, # gaps appendix 11.1
   ct.tx.int   = 2, # gaps appendix 11.1 - mentionned, not explicit
 
-  gc.sympt.prob.tx = c(0.86, 0.91, 0.96),
-  ct.sympt.prob.tx = c(0.72, 0.785, 0.85),
-  gc.asympt.prob.tx = c(0.10, 0.145, 0.19),
-  ct.asympt.prob.tx = c(0.05, 0.525, 0.10),
+  gc.sympt.prob.tx =  rep(0.9, 3),  #c(0.86, 0.91, 0.96),
+  ct.sympt.prob.tx =  rep(0.9, 3),  #c(0.72, 0.785, 0.85),
+  gc.asympt.prob.tx = rep(0.1, 3), #c(0.10, 0.145, 0.19),
+  ct.asympt.prob.tx = rep(0.1, 3), #c(0.05, 0.525, 0.10),
   # gaps appendix 9.3 - 9.4 (not explained this way but similar result)
   sti.cond.eff = 0.95,
   sti.cond.fail = c(0.39, 0.3, 0.21),

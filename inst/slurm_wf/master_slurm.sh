@@ -1,3 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-for f in slurm_wf/job_starters/*; do source $f; done
+for f in "$(dirname $0)/job_starters/*"
+do
+    source $f
+done

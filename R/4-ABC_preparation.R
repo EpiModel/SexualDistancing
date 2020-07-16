@@ -7,10 +7,12 @@ library(EpiABC)
 source("R/utils-ABC.R")
 create_abc_folder(force = TRUE)
 
+t_names <- c("ir100.sti.B", "ir100.sti.H")
 # Main Model Fx -----------------------------------------------------------
 
 f <- function(x) {
   lnt <- TRUE # if FALSE: set `require.lnt` to FALSE and adjust ` prep.start.prob`
+  t_names <- c("ir100.sti.B", "ir100.sti.H")
   source("R/utils-sim_calib_params.R", local = TRUE)
 
   logit <- function(p) log(p / (1 - p))
@@ -38,49 +40,46 @@ f <- function(x) {
   # prep disparities apdx 9.3, 9.4 with baseline 0.35, 0.4 and 0.32, 0.4 for GC
   # and CT. (35 and 4 are mean of intervall),
   # I have no info in the targets to distinguish U to R. So no reason to have 2 params
-  param$ugc.tprob <- x[2]
-  param$rgc.tprob <- logistic(logit(x[2]) + log(1.25))
-  param$uct.tprob <- x[3]
-  param$rct.tprob <- logistic(logit(x[3]) + log(1.25))
+  param$ugc.tprob <- 0.169 # x[2]
+  param$rgc.tprob <- logistic(logit(param$rgc.tprob) + log(1.25))
+  param$uct.tprob <- 0.126 # x[2]
+  param$rct.tprob <- logistic(logit(param$rct.tprob) + log(1.25))
 
   # Same duration for U and R, as in prep disp
-  param$rgc.ntx.int <- x[4]
-  param$ugc.ntx.int <- x[4]
-  param$rct.ntx.int <- x[5]
-  param$uct.ntx.int <- x[5]
+  param$rgc.ntx.int <- 26 # round(x[3], 0)
+  param$ugc.ntx.int <- param$rgc.ntx.int
+  param$rct.ntx.int <- 32 # round(x[3], 0)
+  param$uct.ntx.int <- param$rct.ntx.int
 
   # One base sympt * OR U>R using apdx 10.2, 10.3
   # exp(logit(0.9) - logit(0.16)) = 47.25
   # exp(logit(0.58) - logit(0.14)) = 8.5
-  param$rgc.sympt.prob <- x[6]
-  param$ugc.sympt.prob <- logistic(logit(x[6]) + log(47.25))
-  param$rct.sympt.prob <- x[7]
-  param$uct.sympt.prob <- logistic(logit(x[7]) + log(8.5))
+  param$rgc.sympt.prob <- 0.146 # x[4]
+  param$ugc.sympt.prob <- logistic(logit(param$ugc.sympt.prob) + log(47.25))
+  param$rct.sympt.prob <- 0.382 # x[4]
+  param$uct.sympt.prob <- logistic(logit(param$uct.sympt.prob) + log(8.5))
 
-  ## param$gc.sympt.prob.tx  <- x[10:12]
-  ## param$ct.sympt.prob.tx  <- x[13:15]
-  ## param$gc.asympt.prob.tx <- x[16:18]
-  ## param$ct.asympt.prob.tx <- x[19:21]
+  param$gc.sympt.prob.tx  <- x[2:4]
+  param$ct.sympt.prob.tx  <- x[2:4]
+  param$gc.asympt.prob.tx <- x[5:7]
+  param$ct.asympt.prob.tx <- x[5:7]
+
   ## ## param$gc.tx.int <- x[12]
   ## param$ct.tx.int <- x[15]
-#   param$trans.scale  <- x[6:8]
-  ## param$rgc.sympt.prob <- x[6]
-  ## param$ugc.sympt.prob <- x[7]
-  ## param$rct.sympt.prob <- x[8]
-  ## param$uct.sympt.prob <- x[9]
+  ##  param$trans.scale  <- x[6:8]
 
   ## ## # gaps appendix 9.3 - 9.4 (not explained this way but similar result)
   ## param$sti.cond.eff <- x[16]
   ## param$sti.cond.fail <- x[17:19]
 
   # gaps appendix 9.2
- ##  param$hiv.rgc.rr <- x[18]
- ##  param$hiv.ugc.rr <- x[19]
- ##  param$hiv.rct.rr <- x[20]
- ##  param$hiv.uct.rr <- x[21]
- ## # if both ct + gc -> log(RRgc) + 0.2 * log(RRct) | swap ct and gc if RRct > RRgc
- ##  param$hiv.dual.rr <- x[22]
- ##
+  ##  param$hiv.rgc.rr <- x[18]
+  ##  param$hiv.ugc.rr <- x[19]
+  ##  param$hiv.rct.rr <- x[20]
+  ##  param$hiv.uct.rr <- x[21]
+  ## # if both ct + gc -> log(RRgc) + 0.2 * log(RRct) | swap ct and gc if RRct > RRgc
+  ##  param$hiv.dual.rr <- x[22]
+  ##
 
   ## param$trans.scale  <- x[28:30]
   sim <- netsim(orig, param, init, control)
@@ -103,42 +102,42 @@ f <- function(x) {
   ir100.sti.W <- ir100.sti.W / ir100.sti
 
   p <- c(
-    ## i.prev,
-    ir100.gc, ir100.ct#,
-    ## ir100.sti.B, ir100.sti.H, ir100.sti.W
+    i.prev, ir100.gc, ir100.ct,
+    ir100.sti.B, ir100.sti.H, ir100.sti.W
   )
   names(p) <- c(
-    ## "i.prev.B", "i.prev.H", "i.prev.W",
-    "ir100.gc", "ir100.ct"#,
-    ## "ir100.sti.B", "ir100.sti.H", "ir100.sti.W"
+    "i.prev.B", "i.prev.H", "i.prev.W",
+    "ir100.gc", "ir100.ct",
+    "ir100.sti.B", "ir100.sti.H", "ir100.sti.W"
   )
 
-  p
+  p[t_names]
 }
 
 # ABC Priors and Target Stats ---------------------------------------------
 
-priors <- list(
-  c("unif", .15, .4),     # ugc.tprob (before, 0.1 - 0.6)
-  ## c("unif", .10, .6),  # rgc.tprob - now with 1.25 OR
-  c("unif", .15, .4),     # uct.tprob
-  ## c("unif", .10, .6),  # rct.tprob - now with 1.25 OR
-  c("unif", 20, 52),      # rgc.ntx.int  (before 26 - 52)
-  ## c("unif", 26, 52),   # ugc.ntx.int- now U and R same duration
-  c("unif", 33, 65),       # rct.ntx.int (before 39 - 65)
-  ## c("unif", 39, 65)    # uct.ntx.int - now U and R same duration
-  c("unif", .01, .2),    # rgc.sympt.prob
-  ## c("unif", .6, .95),  # ugc.sympt.prob - now with OR 47.25
-  c("unif", .01, .4)     # rct.sympt.prob
-  ## c("unif", .6, .95),  # uct.sympt.prob - now with OR 8.5
-)
-## priors <- c(
-##   priors,
-##   as.list(rep(list(c("unif", .8, 1)), 3)),    # gc.sympt.prob.tx
-##   as.list(rep(list(c("unif", .8, 1)), 3)),    # ct.sympt.prob.tx
-##   as.list(rep(list(c("unif", .01, .25)), 3)), # gc.asympt.prob.tx
-##   as.list(rep(list(c("unif", .01, .25)), 3))  # ct.asympt.prob.tx
+## priors <- list(
+##   c("unif", .15, .4),     # ugc.tprob (before, 0.1 - 0.6)
+##   c("unif", .10, .6),  # rgc.tprob - now with 1.25 OR
+##   c("unif", .10, .4),     # uct.tprob
+##   c("unif", .10, .6),  # rct.tprob - now with 1.25 OR
+##   c("unif", 20, 52),      # rgc.ntx.int  (before 26 - 52)
+##   c("unif", 26, 52),   # ugc.ntx.int- now U and R same duration
+##   c("unif", 20, 52),       # rct.ntx.int (before 39 - 65)
+##   c("unif", 39, 65)    # uct.ntx.int - now U and R same duration
+##   c("unif", .01, .2),    # rgc.sympt.prob
+##   c("unif", .6, .95),  # ugc.sympt.prob - now with OR 47.25
+##   c("unif", .01, .6),     # rct.sympt.prob
+##   c("unif", .6, .95)  # uct.sympt.prob - now with OR 8.5
 ## )
+
+priors <- c(
+##   priors,
+  as.list(rep(list(c("unif", .8, 1)), 3)),    # gc.sympt.prob.tx
+##   as.list(rep(list(c("unif", .8, 1)), 3)),    # ct.sympt.prob.tx
+  ## as.list(rep(list(c("unif", .01, .25)), 3)), # gc.asympt.prob.tx
+  as.list(rep(list(c("unif", .01, .25)), 3))  # ct.asympt.prob.tx
+)
 ##   ## c("unif", 1, 15),   # gc.tx.int
   ## c("unif", 1, 15),   # ct.tx.int
   
@@ -181,9 +180,10 @@ ir100.sti.H <- ir100.sti.H / ir100.sti
 ir100.sti.W <- ir100.sti.W / ir100.sti
 
 targets <- c(
-  # i.prev,
-  ir100.gc, ir100.ct#,
-  ## ir100.sti.B, ir100.sti.H, ir100.sti.W
+  ## i.prev,
+  ## ir100.gc, ir100.ct,
+  ir100.sti.B, ir100.sti.H
+## , ir100.sti.W
 )
 
 # Run ABC Prep ------------------------------------------------------------
@@ -211,22 +211,23 @@ saveRDS(prep, file = "abc/data/abc.prep.rds")
 
 
 # test before run
-##x <- c(3, vapply(
+## x <- c(3, vapply(
 ##  priors,
 ##  function(x) runif(1, as.numeric(x[2]), as.numeric(x[3])),
 ##  1
-##))
-##
-##df <- f(x)
+## ))
+
+## df <- f(x)
 
 library(glue)
 
-nwaves <- 10 
+nwaves <- 15
 mem <- "150G"
 user <- "aleguil"
 master.file <- "abc/master.sh"
 partition <- "ckpt" #"csde", #"ckpt",
 account <- "csde-ckpt" #"csde", #"csde-ckpt",
+after <- "afterany" # afterany (start if previous finished with any status)
 batchSize <- prep$batchSize
 ncores = prep$ncores
 
@@ -243,7 +244,7 @@ cat("\n", file = master.file, append = TRUE)
 
 cat(
   glue("p0=$(sbatch -p {partition} -A {account} --job-name=process0_{user}",
-       " --export=ALL,wave=0 --depend=afterok:$w0 -c 1 --mem=15G", 
+       " --export=ALL,wave=0 --depend={after}:$w0 -c 1 --mem=15G", 
        " --time=1:00:00 --parsable abc/runprocess.sh)"),
   file = master.file, append = TRUE
 )
@@ -254,7 +255,7 @@ for (i in seq_len(nwaves)) {
   cat(
     glue("w{i}=$(sbatch -p {partition} -A {account} --array=1-{batchSize[2]}", 
          " --job-name=wave{i}_{user} --export=ALL,wave={i}", 
-         " --depend=afterok:$p{i-1} --ntasks-per-node={ncores} --mem={mem}", 
+         " --depend={after}:$p{i-1} --ntasks-per-node={ncores} --mem={mem}", 
          " --time=1:00:00 --parsable abc/runsim.sh)"),
     file = master.file, append = TRUE
   )
@@ -263,36 +264,10 @@ for (i in seq_len(nwaves)) {
   cat(
     glue("p{i}=$(sbatch -p {partition} -A {account}", 
          " --job-name=process{i}_{user} --export=ALL,wave={i}", 
-         " --depend=afterok:$w{i} -c 1 --mem=15G --time=1:00:00", 
+         " --depend={after}:$w{i} -c 1 --mem=15G --time=1:00:00", 
          " --parsable abc/runprocess.sh)"),
     file = master.file, append = TRUE
   )
   cat("\n\n", file = master.file, append = TRUE)
 }
 
-## cat(
-##   glue("sbatch -p {partition} -A {account} --array=1-15 --job-name=wave0_{user} --export=ALL,wave=0  --ntasks-per-node=28 --mem={mem} --time=1:00:00 abc/runsim.sh"),
-##   file = master.file, append = TRUE
-## )
-## cat("\n", file = master.file, append = TRUE)
-## 
-## cat(
-##   glue("sbatch -p {partition} -A {account} --job-name=process0_{user} --export=ALL,wave=0 --depend=afterany:$(squeue --noheader --Format arrayjobid --name wave0_{user} | uniq) -c 1 --mem=15G --time=1:00:00 abc/runprocess.sh"),
-##   file = master.file, append = TRUE
-##   )
-## cat("\n\n", file = master.file, append = TRUE)
-## 
-## 
-## for (i in seq_len(nwaves)) {
-##   cat(
-##     glue("sbatch -p {partition} -A {account} --array=1-14 --job-name=wave{i}_{user} --export=ALL,wave={i} --depend=afterany:$(squeue --noheader --Format arrayjobid --name process{i-1}_{user} | uniq) --ntasks-per-node=28 --mem={mem} --time=1:00:00 abc/runsim.sh"),
-##          file = master.file, append = TRUE
-##          )
-##     cat("\n", file = master.file, append = TRUE)
-## 
-##     cat(
-##       glue("sbatch -p {partition} -A {account} --job-name=process{i}_{user} --export=ALL,wave={i} --depend=afterany:$(squeue --noheader --Format arrayjobid --name wave{i}_{user} | uniq) -c 1 --mem=15G --time=1:00:00 abc/runprocess.sh"),
-##            file = master.file, append = TRUE
-##            )
-##       cat("\n\n", file = master.file, append = TRUE)
-## }

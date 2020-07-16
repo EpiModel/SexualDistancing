@@ -1,9 +1,10 @@
+library(data.table)
 library(tidyverse)
 library(EpiABC)
 
 ## sims <- readRDS("out/only_rprob/abc.wave5.rda")
 
-out <- get_posterior(wave = 3, input = "out/out")
+out <- get_posterior(wave = 7, input = "out/gc_only/")
 summary(out, digits = 3)
 
 boxplot(out, type = "stats")
@@ -14,46 +15,53 @@ plot(out, type = "param")
 
 boxplot(out, type = "param")
 
+out$param[sample(length(out$weights), 10, replace = TRUE, prob = out$weights),]
 
 s <- readRDS("out/out/abc.wave0.batch0001.rda")
-s$tab_ini
+prms <- s$cwave$tab_param
 
-for (f in list.files("out/out")) {
-  s <- readRDS(paste0("out/out/", f))
-  print(f)
-  print(head(s$tab_ini))
+prms[order(prms[, 2], decreasing = F), ]
+
+
+# Check sims
+slurm_dir <- "slurm"
+parms <- readRDS(paste0("out/", slurm_dir, "_xs.rds"))
+parms_mat <- matrix(flatten_dbl(parms), ncol = 3, byrow = TRUE)
+
+dt <- data.table()
+
+for (i in 1:125) {
+  s <- readRDS(paste0("out/", slurm_dir, "/sim", i, ".rds"))
+  dtt <- as.data.table(s)
+  dtt[, `:=`(batch = i)]
+  dt <- rbindlist(list(dt, dtt))
 }
 
-data_dir <- "out/out/"
-wave <- 0
-merge_abc(
-  wave = wave,
-  indir = data_dir,
-  outdir = data_dir
-)
+dt_sum <- dt %>%
+  group_by(batch) %>%
+  summarize(across(
+    c(ir100.gc, ir100.ct),
+    list(q1 = ~ quantile(.x, 0.25),
+         q2 = median,
+         q3 = ~ quantile(.x, 0.75)),
+    .names = "{fn}{col}"))
 
-suppressMessages(library(methods))
-suppressMessages(library(EpiABC))
-suppressMessages(library(EpiModel))
-data_dir <- "out/"
+dt_sum %>%
+  arrange(q3ir100.gc)
 
-abc_smc_process(
-  input = data_dir,
-  wave = 0,
-  save = TRUE,
-  outdir = data_dir
-)
+trials <- dt_sum %>%
+  arrange(q3ir100.gc) %>%
+  pull(batch) %>%
+  head(10)
 
+summary(dt$ir100.gc) # 4.4
+summary(dt$ir100.ct) # 6.6
 
-data_dir <- "out/out/out"
-input <- data_dir
-outdir <- data_dir
-wave <- 0
-save <- TRUE
+dt[batch %in% c(106, 1, 26),] %>%
+  ggplot(aes(x = time, y = ir100.gc, col = as.factor(sim))) +
+    ## geom_line(alpha = 0.5) +
+    geom_smooth(alpha = 0.5) +
+    facet_grid(cols = vars(batch)) +
+    theme(legend.position = NULL)
 
-abc_smc_process(
-  input = data_dir,
-  wave = 1,
-  save = TRUE,
-  outdir = data_dir
-)
+parms_mat[trials,]
