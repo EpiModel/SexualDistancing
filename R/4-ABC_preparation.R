@@ -19,7 +19,7 @@ f <- function(x) {
   logistic <- function(p) 1 / (1 + exp(-p))
 
   control <- control_msm(
-    nsteps = 52 * 68,
+    nsteps = 52 * 3,#68,
     ## nsims = 3,
     ## ncores = 3,
     ## save.nwstats = FALSE,
@@ -211,13 +211,13 @@ saveRDS(prep, file = "abc/data/abc.prep.rds")
 
 
 # test before run
-## x <- c(3, vapply(
-##  priors,
-##  function(x) runif(1, as.numeric(x[2]), as.numeric(x[3])),
-##  1
-## ))
+x <- c(3, vapply(
+ priors,
+ function(x) runif(1, as.numeric(x[2]), as.numeric(x[3])),
+ 1
+))
 
-## df <- f(x)
+df <- f(x)
 
 library(glue)
 

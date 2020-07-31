@@ -22,20 +22,55 @@ prms <- s$cwave$tab_param
 
 prms[order(prms[, 2], decreasing = F), ]
 
+library(EpiABC)
+library(data.table)
+library(tidyverse)
 
 # Check sims
-slurm_dir <- "slurm"
+slurm_dir <- "slurm_ckpt"
 parms <- readRDS(paste0("out/", slurm_dir, "_xs.rds"))
 parms_mat <- matrix(flatten_dbl(parms), ncol = 3, byrow = TRUE)
 
 dt <- data.table()
 
-for (i in 1:125) {
-  s <- readRDS(paste0("out/", slurm_dir, "/sim", i, ".rds"))
-  dtt <- as.data.table(s)
-  dtt[, `:=`(batch = i)]
-  dt <- rbindlist(list(dt, dtt))
-}
+## for (slurm_dir in c("slurm_ckpt/", "slurm_csde/")) {
+  i <- 0
+  for ( file in list.files(paste0("out/", slurm_dir), pattern = ".rds") ) {
+    s <- readRDS(paste0("out/", slurm_dir, "/", file))
+    dtt <- as.data.table(s)
+    dtt[, `:=`(batch = str_extract(file, "\\d+"))]
+    dt <- rbindlist(list(dt, dtt))
+  }
+## }
+
+dt <- as_tibble(dt)
+
+extinct <- dt %>%
+  filter(time > 3900 - 52 * 3) %>%
+  filter(prev.gc == 0 | prev.ct == 0) %>%
+  select(batch, sim) %>%
+  unique()
+
+dt %>%
+  filter(time > 3900 - 52 * 10) %>%
+  anti_join(extinct) %>%
+  summarize(across(
+    c(ir100.gc, ir100.ct),
+    list(q1 = ~ quantile(.x, 0.25),
+         q2 = median,
+         q3 = ~ quantile(.x, 0.75)),
+    .names = "{fn}{col}"))
+
+dt %>%
+  filter(time > 3900 - 52 * 10) %>%
+  ## anti_join(extinct) %>%
+  summarize(across(
+    starts_with("i.prev.dx."),
+    list(q1 = ~ quantile(.x, 0.25),
+         q2 = median,
+         q3 = ~ quantile(.x, 0.75)),
+    .names = "{fn}{col}")) %>%
+  as.list()
 
 dt_sum <- dt %>%
   group_by(batch) %>%
@@ -47,17 +82,33 @@ dt_sum <- dt %>%
     .names = "{fn}{col}"))
 
 dt_sum %>%
-  arrange(q3ir100.gc)
+  filter(q2ir100.gc > 0) %>%
+  arrange((q2ir100.gc - 4.4)^2)
 
-trials <- dt_sum %>%
-  arrange(q3ir100.gc) %>%
+dt_sum %>%
+  filter(q2ir100.gc > 0) %>%
+  arrange((q2ir100.gc - 4.4)^2) %>%
   pull(batch) %>%
-  head(10)
+  as.numeric() %>%
+  head(10) %>%
+  parms_mat[., ]
+
+dt_sum %>%
+  filter(q2ir100.ct > 0) %>%
+  arrange((q2ir100.ct - 6.6)^2)
+
+dt_sum %>%
+  filter(q2ir100.ct > 0) %>%
+  arrange((q2ir100.ct - 6.6)^2) %>%
+  pull(batch) %>%
+  as.numeric() %>%
+  head(10) %>%
+  parms_mat[., ]
 
 summary(dt$ir100.gc) # 4.4
 summary(dt$ir100.ct) # 6.6
 
-dt[batch %in% c(106, 1, 26),] %>%
+dt[batch %in% trials[1:3],] %>%
   ggplot(aes(x = time, y = ir100.gc, col = as.factor(sim))) +
     ## geom_line(alpha = 0.5) +
     geom_smooth(alpha = 0.5) +
