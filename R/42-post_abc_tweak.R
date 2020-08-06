@@ -7,11 +7,11 @@ parms_steps <- function(low, high, n) {
   low + (high - low) * c(0, 1:(n - 1)/(n - 1))
 }
 
-n_cut <- 5
+n_cut <- 6
 parms_bounds <- list(
-  gc_tprob = c(0.1, 0.15),
-  gc_dur = c(20, 28),
-  gc_txprob = c(0.6, 0.92)
+  gc_tprob = c(0.1, 0.3),
+  gc_dur = c(20, 50),
+  gc_txprob = c(0.6, 0.95)
 )
 
 lxs <- map_df(parms_bounds, ~ parms_steps(.x[1], .x[2], n_cut))
@@ -82,20 +82,6 @@ control <- control_msm(
   verbose = TRUE
 )
 
-## out <- get_posterior(wave = 7, input = "out/gc_only")
-## x_gc <- out$param[
-##   sample(length(out$weights), 10,
-##          replace = TRUE, prob = out$weights),
-##   ]
-
-## out <- get_posterior(wave = 6, input = "out/ct_only")
-## x_ct <- out$param[
-##   sample(length(out$weights), 10,
-##          replace = TRUE, prob = out$weights),
-##   ]
-
-## xs <- asplit(cbind(x_gc, x_ct), 1)
-
 sim_nums <- 1:length(xs)
 
 source("R/utils-slurm_wf.R")
@@ -110,10 +96,6 @@ shared_res <- list(
   memory = 5 * 1e3 # in Mb and PER CPU
 )
 
-sim_nums <- 1:100
-# x <- c(0.1, 28, 0.92, 0.1, 26, 0.84)
-x <- c(0.1, 28, 0.94, 0.1, 26, 0.845)
-
 slurm_wf_Map(
   info$root_dir,
   resources = c(shared_res, list(
@@ -122,9 +104,14 @@ slurm_wf_Map(
   )),
   FUN = mod_fun,
   sim_num = sim_nums,
-  MoreArgs = list(x = x, orig = orig, param = param, init = init, control = control,
+  x = xs,
+  MoreArgs = list(orig = orig, param = param, init = init, control = control,
                   info = info, keep = 52 * 10)
 )
+
+## sim_nums <- 1:100
+## x <- c(0.1, 28, 0.92, 0.1, 26, 0.84)
+## x <- c(0.1, 26, 0.82, 0.1, 39, 0.88)
 
 ## slurm_wf_Map(
 ##   info$root_dir,
@@ -134,7 +121,6 @@ slurm_wf_Map(
 ##   )),
 ##   FUN = mod_fun,
 ##   sim_num = sim_nums,
-##   x = xs,
-##   MoreArgs = list(orig = orig, param = param, init = init, control = control,
+##   MoreArgs = list(x = x, orig = orig, param = param, init = init, control = control,
 ##                   info = info, keep = 52 * 10)
 ## )
