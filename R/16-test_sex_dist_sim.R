@@ -17,23 +17,23 @@ param$netresim.disl.rr = c(1, 1)
 init <- init_msm(
   prev.ugc = 0.015,
   prev.rct = 0.015,
-  prev.rgc = 0.01,
+  prev.rgc = 0.015,
   prev.uct = 0.015
 )
 
 param$param_updaters <- list(
   list(
-    at = 52 * 2, verbose = TRUE,
+    at = 52 * 1, verbose = TRUE,
     param = list(
-      netresim.form.rr = rep(0.5, 3),
-      netresim.disl.rr = c(2, 2)
+      netresim.form.rr = rep(2, 3),
+      netresim.disl.rr = rep(0.1, 2)
     )
   ),
   list(
-    at = 52 * 3, verbose = TRUE,
+    at = 52 * 2, verbose = TRUE,
     param = list(
-      netresim.form.rr = rep(0.8, 3),
-      netresim.disl.rr = c(1.3, 1.3)
+      netresim.form.rr = rep(10, 3),
+      netresim.disl.rr = rep(1, 2)
     )
   )
 )
@@ -41,3 +41,4 @@ param$param_updaters <- list(
 sim <- netsim(orig, param, init, control)
 df <- as.data.frame(sim)
 
+plot(df$time, df$incid)

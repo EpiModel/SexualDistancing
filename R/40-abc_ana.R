@@ -29,7 +29,7 @@ library(tidyverse)
 # Check sims
 slurm_dir <- "slurm_ckpt"
 parms <- readRDS(paste0("out/", slurm_dir, "_xs.rds"))
-parms_mat <- matrix(flatten_dbl(parms), ncol = 3, byrow = TRUE)
+parms_mat <- matrix(flatten_dbl(parms), ncol = length(parms[[1]]), byrow = TRUE)
 
 dt <- data.table()
 
@@ -40,13 +40,14 @@ dt <- data.table()
     dtt <- as.data.table(s)
     dtt[, `:=`(batch = str_extract(file, "\\d+"))]
     dt <- rbindlist(list(dt, dtt))
+    if (1 %% 10 == 0) gc()
   }
 ## }
 
 dt <- as_tibble(dt)
 
 extinct <- dt %>%
-  filter(time > 3900 - 52 * 3) %>%
+  filter(time > max(time) - 52 * 3) %>%
   filter(prev.gc == 0 | prev.ct == 0) %>%
   select(batch, sim) %>%
   unique()
@@ -72,6 +73,9 @@ dt %>%
     .names = "{fn}{col}")) %>%
   as.list()
 
+
+
+
 dt_sum <- dt %>%
   group_by(batch) %>%
   summarize(across(
@@ -83,30 +87,30 @@ dt_sum <- dt %>%
 
 dt_sum %>%
   filter(q2ir100.gc > 0) %>%
-  arrange((q2ir100.gc - 4.4)^2)
+  arrange((q2ir100.gc - 12.81)^2) #%>% saveRDS("out/diag/calib_sti_val_gc.rds")
 
 dt_sum %>%
   filter(q2ir100.gc > 0) %>%
-  arrange((q2ir100.gc - 4.4)^2) %>%
+  arrange((q2ir100.gc - 12.81)^2) %>%
   pull(batch) %>%
   as.numeric() %>%
   head(10) %>%
-  parms_mat[., ]
+  parms_mat[., ] #%>% saveRDS("out/diag/calib_sti_parms_gc.rds")
 
 dt_sum %>%
   filter(q2ir100.ct > 0) %>%
-  arrange((q2ir100.ct - 6.6)^2)
+  arrange((q2ir100.ct - 14.59)^2) #%>% saveRDS("out/diag/calib_sti_val_ct.rds")
 
 dt_sum %>%
   filter(q2ir100.ct > 0) %>%
-  arrange((q2ir100.ct - 6.6)^2) %>%
+  arrange((q2ir100.ct - 14.59)^2) %>%
   pull(batch) %>%
   as.numeric() %>%
   head(10) %>%
-  parms_mat[., ]
+  parms_mat[., ] #%>% saveRDS("out/diag/calib_sti_parms_ct.rds")
 
-summary(dt$ir100.gc) # 4.4
-summary(dt$ir100.ct) # 6.6
+summary(dt$ir100.gc) # 4.4 # 12.81
+summary(dt$ir100.ct) # 6.6 # 14.59
 
 dt[batch %in% trials[1:3],] %>%
   ggplot(aes(x = time, y = ir100.gc, col = as.factor(sim))) +

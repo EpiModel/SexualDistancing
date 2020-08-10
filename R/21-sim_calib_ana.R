@@ -19,7 +19,10 @@ targets <- c(
   cc.linked1m.W = 0.76,
   cc.vsupp.B = 0.55,
   cc.vsupp.H = 0.60,
-  cc.vsupp.W = 0.72
+  cc.vsupp.W = 0.72,
+  #
+  ir100.gc = 12.81,
+  ir100.ct = 14.59
 )
 
 
