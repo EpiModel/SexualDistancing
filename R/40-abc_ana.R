@@ -25,12 +25,12 @@ prms[order(prms[, 2], decreasing = F), ]
 library(EpiABC)
 library(data.table)
 library(tidyverse)
-
 # Check sims
 slurm_dir <- "slurm_ckpt"
 parms <- readRDS(paste0("out/", slurm_dir, "_xs.rds"))
 parms_mat <- matrix(flatten_dbl(parms), ncol = length(parms[[1]]), byrow = TRUE)
 
+slurm_dir <- "choose/3"
 dt <- data.table()
 
 ## for (slurm_dir in c("slurm_ckpt/", "slurm_csde/")) {
@@ -93,6 +93,7 @@ dt_sum %>%
   filter(q2ir100.gc > 0) %>%
   arrange((q2ir100.gc - 12.81)^2) %>%
   pull(batch) %>%
+  ## substr(17, 18) %>%
   as.numeric() %>%
   head(10) %>%
   parms_mat[., ] #%>% saveRDS("out/diag/calib_sti_parms_gc.rds")
@@ -105,6 +106,7 @@ dt_sum %>%
   filter(q2ir100.ct > 0) %>%
   arrange((q2ir100.ct - 14.59)^2) %>%
   pull(batch) %>%
+  ## substr(17, 18) %>%
   as.numeric() %>%
   head(10) %>%
   parms_mat[., ] #%>% saveRDS("out/diag/calib_sti_parms_ct.rds")
@@ -120,3 +122,19 @@ dt[batch %in% trials[1:3],] %>%
     theme(legend.position = NULL)
 
 parms_mat[trials,]
+
+
+dt_sum %>%
+  filter(q2ir100.gc > 0 & q2ir100.ct > 0) %>%
+  mutate(score = (q2ir100.gc - 12.81)^2 + (q2ir100.ct - 14.59)^2) %>%
+  arrange(score)
+
+dt_sum %>%
+  filter(q2ir100.gc > 0 & q2ir100.ct > 0) %>%
+  mutate(score = (q2ir100.gc - 12.81)^2 + (q2ir100.ct - 14.59)^2) %>%
+  arrange(score) %>%
+  pull(batch) %>%
+  ## substr(17, 18) %>%
+  as.numeric() %>%
+  head(10) %>%
+  parms_mat[., ] #%>% saveRDS("out/diag/calib_sti_parms_ct.rds")

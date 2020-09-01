@@ -26,7 +26,7 @@ param <- param_msm(
   max.time.on.tx.part.int = 52 * 10,
   max.time.off.tx.part.int = 52 * 10,
   aids.mr = 1 / 250,
-  trans.scale = c(2.68, 0.4, 0.27), #c(2.21, 0.405, 0.255),
+  trans.scale =  c(2.7, 0.35, 0.243), #c(2.21, 0.405, 0.255),
   acts.scale = 1.00,
   acts.aids.vl = 5.75,
   circ.prob = c(0.874, 0.874, 0.918),
@@ -49,19 +49,19 @@ param <- param_msm(
   ## If not mentionned -> default from prep disparities
   ## for H : mean(c(B, W))
   #ok
-  rgc.tprob = 0.357,  # gaps appendix 9.4
-  ugc.tprob = 0.248,  # gaps appendix 9.4
-  rct.tprob = 0.3216, # gaps appendix 9.3
-  uct.tprob = 0.213,  # gaps appendix 9.3
-  rgc.sympt.prob = 0.077, # gaps appendix 10.3
-  ugc.sympt.prob = 0.824, # gaps appendix 10.3
-  rct.sympt.prob = 0.1035,# gaps appendix 10.2
-  uct.sympt.prob = 0.885, # gaps appendix 10.2
-  rgc.ntx.int = 35.11851, # gaps appendix 11.2
-  ugc.ntx.int = 35.11851, # gaps appendix 11.2
+  rgc.tprob = 0.2267303, #logistic(logit(0.19) + log(1.25)) #0.357,  # gaps appendix 9.4
+  ugc.tprob = 0.19,# 0.248,  # gaps appendix 9.4
+  rct.tprob = 0.2038369, #logistic(logit(0.17) + log(1.25)) #0.3216, # gaps appendix 9.3
+  uct.tprob = 0.17,#0.213,  # gaps appendix 9.3
+  rgc.sympt.prob = 0.1,#0.077, # gaps appendix 10.3
+  ugc.sympt.prob = 0.9333333,#0.824, # gaps appendix 10.3
+  rct.sympt.prob = 0.1,#0.1035,# gaps appendix 10.2
+  uct.sympt.prob = 0.95,#0.885, # gaps appendix 10.2
+  rgc.ntx.int = 26,#35.11851, # gaps appendix 11.2
+  ugc.ntx.int = 26,#35.11851, # gaps appendix 11.2
   gc.tx.int   = 2, # gaps appendix 11.2 - mentionned, not explicit
-  rct.ntx.int = 44.24538, # gaps appendix 11.1
-  uct.ntx.int = 44.24538, # gaps appendix 11.1
+  rct.ntx.int = 32,#44.24538, # gaps appendix 11.1
+  uct.ntx.int = 32,#44.24538, # gaps appendix 11.1
   ct.tx.int   = 2, # gaps appendix 11.1 - mentionned, not explicit
 
   gc.sympt.prob.tx =  rep(0.9, 3),  #c(0.86, 0.91, 0.96),
@@ -91,8 +91,8 @@ if (lnt == FALSE) {
 }
 
 init <- init_msm(
-  prev.ugc = 0,
-  prev.rct = 0,
-  prev.rgc = 0,
-  prev.uct = 0
+  prev.ugc = 0.05,
+  prev.rct = 0.05,
+  prev.rgc = 0.05,
+  prev.uct = 0.05
 )

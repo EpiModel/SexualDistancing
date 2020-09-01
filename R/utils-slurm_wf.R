@@ -7,17 +7,16 @@
 #'
 #' @return the created folder path (invisible)
 slurm_wf_tmpl_dir <- function(template_dir, wf_dir, force = FALSE) {
-  if (dir.exists(wf_dir)) {
+  if (fs::dir_exists(wf_dir)) {
     if (force) {
-      message(paste("Folder: ", wf_dir, "exists. Erasing it (force == TRUE)"))
-      unlink(wf_dir, recursive = TRUE)
+      message("Folder: '", wf_dir, "' exists. Erasing it (force == TRUE)")
+      fs::dir_delete(wf_dir)
     } else {
-      stop(paste(wf_dir, "exists. To erasing it set `force = TRUE`"))
+      stop("Folder: '", wf_dir, "' exists. To erasing it set `force = TRUE`")
     }
   }
 
   fs::dir_copy(template_dir, wf_dir)
-
   invisible(wf_dir)
 }
 
@@ -29,9 +28,9 @@ slurm_wf_tmpl_dir <- function(template_dir, wf_dir, force = FALSE) {
 #' @param what function to execute
 #' @param args a list of named parameters to pass to `what`
 slurm_wf_do.call <- function(wf_dir, resources, what, args = list()) {
-  job_dir <- paste0(wf_dir, "/job_scripts/")
-  starter_dir <- paste0(wf_dir, "/job_starters/")
-  rds_dir <- paste0(wf_dir, "/job_rds/")
+  job_dir <- fs::path(wf_dir, "job_scripts/")
+  starter_dir <- fs::path(wf_dir, "job_starters/")
+  rds_dir <- fs::path(wf_dir, "job_rds/")
 
   other_jobs <- list.files(job_dir)
   if (length(other_jobs) == 0) {
