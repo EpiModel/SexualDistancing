@@ -1,12 +1,12 @@
 source("R/utils-slurm_prep_helpers.R") # requires `purrr`
 source("R/utils-slurm_wf.R")
-test_simulation <- TRUE
+test_simulation <- FALSE
 
 # Set slurm parameters ---------------------------------------------------------
-batch_per_set <- 4      # How many 28 replications to do per parameter
-steps_to_keep <- NULL#10 * 52 # Steps to keep in the output df. If NULL, return sim obj
+batch_per_set <- 5      # How many 28 replications to do per parameter
+steps_to_keep <- 10 * 52 # Steps to keep in the output df. If NULL, return sim obj
 partition <- "csde"     # On hyak, either ckpt or csde
-job_name <- "SD_jobs_test"
+job_name <- "SD_scenario_debug_small"
 ssh_host <- "hyak_mox"
 ssh_dir <- "gscratch/SexualDistancing/"
 
@@ -30,73 +30,400 @@ tmp_epi <- readRDS("out/est/tmp_epi.rds")
 orig$epi <- lapply(names(tmp_epi$epi), function(n) orig$epi[[n]])
 names(orig$epi) <- names(tmp_epi$epi)
 
+# run 20 rng years before scenarios
+param$prep.start = orig$control$nsteps + 5 * 52 + 1
+param$riskh.start = param$prep.start - 52
+step_ana_start <- param$prep.start + 5 * 52
+step_interv_start <- step_ana_start + 1 * 52
+step_interv_stop <- step_interv_start + 2.5 * 52
+step_ana_stop <- step_interv_stop + 1.5 * 52
+
 control <- control_msm(
-  nsteps = (65 + 20) * 52,
+  start = orig$control$nsteps + 1,
+  nsteps = step_ana_stop,
   nsims = 28,
   ncores = 28,
   save.nwstats = FALSE,
-  start = orig$control$nsteps + 1,
   initialize.FUN = reinit_msm,
   save.clin.hist = FALSE,
   verbose = FALSE
 )
 
-# run 20 rng years before scenarios
-param$prep.start = (52 * 75) + 1
-param$riskh.start = 52 * 74
 
-# Parameters to test -----------------------------------------------------------
-#
-param_proposals <- list(
-  trans.scale = seq_cross( # 4^3 values to test; See utils-slurm_prep_helpers.R
-    c(1.5, 0.5, 0.5),
-    c(2.5, 1.5, 1.5),
-    length.out = 2
-  ),
-  uct.tprob = as.list(seq(0.8, 0.98, length.out = 4)), # 4 values to test
-  ugc.tprob = list(0.3, 0.1), # 2 values to test
-  tx.init.prob = list( # 2 values to test (each contains a set of 3)
-    c(0.12, 0.15, 0.16),
-    c(0.11, 0.10, 0.14)
+# Return all scenarios to normal at timestep 2.5 year after prep_calib
+param$param_updaters <- list(
+  list(
+    at = step_interv_stop,
+    param = list(
+      netresim.form.rr = rep(1, 3),
+      netresim.disl.rr = rep(1, 2),
+      prep.start.prob = param$prep.start.prob,
+      prep.discont.rate = param$prep.discont.rate,
+      tx.halt.part.prob = param$tx.halt.part.prob,
+      gc.sympt.prob.tx = param$gc.sympt.prob.tx,
+      gc.asympt.prob.tx = param$gc.asympt.prob.tx,
+      ct.sympt.prob.tx = param$ct.sympt.prob.tx,
+      ct.asympt.prob.tx = param$ct.asympt.prob.tx
+    )
   )
 )
 
-# Use this line to run only the default values
-param_proposals <- list(base_params__ = TRUE)
 
-# Cross all possible combinations? Can grow super fast
-test_all_combination <- FALSE
-# Finalize param_proposal list
-if (test_all_combination) {
-  param_proposals <- purrr::cross(param_proposals)
-} else {
-  param_proposals <- transpose_ragged(param_proposals)
-}
-
-# Make some additional changes to param_proposals using the present values
-# must return NULL if the required elements are NULL
-relative_params <- list(
-  rgc.tprob = function(param) {
-    out <- NULL
-    if (!is.null(param$ugc.tprob))
-      out <- logistic(logit(param$ugc.tprob) + log(1.25))
-    out
-  },
-  rct.tprob = function(param) {
-    out <- NULL
-    if (!is.null(param$uct.tprob))
-      out <- logistic(logit(param$uct.tprob) + log(1.25))
-    out
-  }
+# Scenarios --------------------------------------------------------------------
+scenarios <- list(
+  base = list(),
+  net_all_05 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = c(1, 0.5, 0.5),
+        netresim.disl.rr = c(1, 0.5)
+        )
+    )
+  ),
+  net_all_09 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = c(1, 0.1, 0.1),
+        netresim.disl.rr = c(1, 0.1)
+      )
+    )
+  ),
+  net_casl_05 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = c(1, 0.5, 1),
+        netresim.disl.rr = c(1, 0.5)
+      )
+    )
+  ),
+  net_casl_09 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = c(1, 0.1, 1),
+        netresim.disl.rr = c(1, 0.1)
+      )
+    )
+  ),
+  net_casl_1 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = c(1, 0, 1),
+        netresim.disl.rr = c(1, 0)
+      )
+    )
+  ),
+  net_ot_05 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = c(1, 1, 0.5)
+      )
+    )
+  ),
+  net_ot_09 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = c(1, 1, 0.1)
+      )
+    )
+  ),
+  net_ot_1 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = c(1, 1, 0)
+      )
+    )
+  ),
+  ser_prep_05 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        prep.start.prob = param$prep.start.prob * 0.5,
+        prep.discont.rate = param$prep.discont.rate / 0.5
+      )
+    )
+  ),
+  ser_prep_09 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        prep.start.prob = param$prep.start.prob * 0.1,
+        prep.discont.rate = param$prep.discont.rate / 0.1
+      )
+    )
+  ),
+  ser_scre_05 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        hiv.test.rate = param$hiv.test.rate * 0.5
+      )
+    )
+  ),
+  ser_scre_09 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        hiv.test.rate = param$hiv.test.rate * 0.1
+      )
+    )
+  ),
+  ser_art_05 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        tx.halt.part.prob = param$tx.halt.part.prob * 0.5
+      )
+    )
+  ),
+  ser_art_09 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        tx.halt.part.prob = param$tx.halt.part.prob * 0.1
+      )
+    )
+  ),
+  ser_stitx_05 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.5,
+        gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.5,
+        ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.5,
+        ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.5
+      )
+    )
+  ),
+  ser_stitx_09 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.1,
+        gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.1,
+        ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.1,
+        ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.1
+      )
+    )
+  ),
+  comb_025_05 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = rep(0.75, 3),
+        netresim.disl.rr = rep(0.75, 2),
+        prep.start.prob = param$prep.start.prob * 0.5,
+        prep.discont.rate = param$prep.discont.rate / 0.5,
+        hiv.test.rate = param$hiv.test.rate * 0.5,
+        gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.5,
+        gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.5,
+        ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.5,
+        ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.5
+      )
+    )
+  ),
+  comb_025_09 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = rep(0.75, 3),
+        netresim.disl.rr = rep(0.75, 2),
+        prep.start.prob = param$prep.start.prob * 0.1,
+        prep.discont.rate = param$prep.discont.rate / 0.1,
+        hiv.test.rate = param$hiv.test.rate * 0.1,
+        gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.1,
+        gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.1,
+        ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.1,
+        ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.1
+      )
+    )
+  ),
+  comb_05_05 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = rep(0.5, 3),
+        netresim.disl.rr = rep(0.5, 2),
+        prep.start.prob = param$prep.start.prob * 0.5,
+        prep.discont.rate = param$prep.discont.rate / 0.5,
+        hiv.test.rate = param$hiv.test.rate * 0.5,
+        gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.5,
+        gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.5,
+        ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.5,
+        ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.5
+      )
+    )
+  ),
+  comb_05_09 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = rep(0.5, 3),
+        netresim.disl.rr = rep(05, 2),
+        prep.start.prob = param$prep.start.prob * 0.1,
+        prep.discont.rate = param$prep.discont.rate / 0.1,
+        hiv.test.rate = param$hiv.test.rate * 0.1,
+        gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.1,
+        gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.1,
+        ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.1,
+        ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.1
+      )
+    )
+  ),
+  comb_075_05 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = rep(0.75, 3),
+        netresim.disl.rr = rep(0.75, 2),
+        prep.start.prob = param$prep.start.prob * 0.5,
+        prep.discont.rate = param$prep.discont.rate / 0.5,
+        hiv.test.rate = param$hiv.test.rate * 0.5,
+        gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.5,
+        gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.5,
+        ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.5,
+        ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.5
+      )
+    )
+  ),
+  comb_075_09 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = rep(0.75, 3),
+        netresim.disl.rr = rep(0.75, 2),
+        prep.start.prob = param$prep.start.prob * 0.1,
+        prep.discont.rate = param$prep.discont.rate / 0.1,
+        hiv.test.rate = param$hiv.test.rate * 0.1,
+        gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.1,
+        gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.1,
+        ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.1,
+        ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.1
+      )
+    )
+  ),
+  comb_09_05 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = rep(0.9, 3),
+        netresim.disl.rr = rep(0.9, 2),
+        prep.start.prob = param$prep.start.prob * 0.5,
+        prep.discont.rate = param$prep.discont.rate / 0.5,
+        hiv.test.rate = param$hiv.test.rate * 0.5,
+        gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.5,
+        gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.5,
+        ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.5,
+        ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.5
+      )
+    )
+  ),
+  comb_09_09 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = rep(0.9, 3),
+        netresim.disl.rr = rep(0.9, 2),
+        prep.start.prob = param$prep.start.prob * 0.1,
+        prep.discont.rate = param$prep.discont.rate / 0.1,
+        hiv.test.rate = param$hiv.test.rate * 0.1,
+        gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.1,
+        gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.1,
+        ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.1,
+        ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.1
+      )
+    )
+  )
 )
 
-# Apply the relative_params functions; See utils-slurm_prep_helpers.R
-param_proposals <- make_relative_params(param_proposals, relative_params)
+# small version ----------------------------------------------------------------
+scenarios <- list(
+  base = list(),
+  net_casl_09 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = c(1, 0.1, 1),
+        netresim.disl.rr = c(1, 0.1)
+      )
+    )
+  ),
+  net_ot_09 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = c(1, 1, 0.1)
+      )
+    )
+  ),
+  ser_prep_09 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        prep.start.prob = param$prep.start.prob * 0.1,
+        prep.discont.rate = param$prep.discont.rate / 0.1
+      )
+    )
+  ),
+  ser_scre_09 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        hiv.test.rate = param$hiv.test.rate * 0.1
+      )
+    )
+  ),
+  ser_art_09 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        tx.halt.part.prob = param$tx.halt.part.prob * 0.1
+      )
+    )
+  ),
+  ser_stitx_09 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.1,
+        gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.1,
+        ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.1,
+        ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.1
+      )
+    )
+  ),
+  comb_09_09 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = rep(0.9, 3),
+        netresim.disl.rr = rep(0.9, 2),
+        prep.start.prob = param$prep.start.prob * 0.1,
+        prep.discont.rate = param$prep.discont.rate / 0.1,
+        hiv.test.rate = param$hiv.test.rate * 0.1,
+        gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.1,
+        gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.1,
+        ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.1,
+        ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.1
+      )
+    )
+  )
+)
+
+## s/logistic(logit(\(.*\)) \+ log(\(.*\)))/\1 * \2/
+## s/logistic(logit(\(.*\)) - log(\(.*\)))/\1 \/ \2/
 
 # Automatic --------------------------------------------------------------------
 #
-param_proposals <- rep(param_proposals, batch_per_set)
-sim_nums <- seq_along(param_proposals)
+updaters <- rep(scenarios, batch_per_set)
+sim_nums <- seq_along(updaters)
 
 # Required directories
 paths <- make_job_paths(job_name, ssh_dir, ssh_host)
@@ -111,7 +438,7 @@ info$job_name <- job_name
 info$ssh_host <- ssh_host
 info$root_dir <- fs::path(paths$jobs_dir, job_name, paths$slurm_wf)
 info$df_keep <- steps_to_keep
-info$param_proposals <- param_proposals
+info$updaterss <- updaters
 
 slurm_wf_tmpl_dir("inst/slurm_wf/", info$root_dir, force = T)
 
@@ -125,24 +452,30 @@ shared_res <- list(
 slurm_wf_Map(
   info$root_dir,
   resources = slurm_ressources,
-  FUN = run_netsim_fun,
+  FUN = run_netsim_updaters_fun ,
   sim_num = sim_nums,
-  param_proposal = param_proposals,
+  updaters = updaters,
   MoreArgs = list(orig = orig, param = param, init = init, control = control,
                   info = info)
 )
 
 if (test_simulation) {
-  control$nsteps = 68 * 52
-  control$nsims = 1
-  control$ncores = 1
-  control$verbose = TRUE
+  control$nsims <- 1
+  control$ncores <- 1
+  control$verbose <- FALSE
 
-  run_netsim_fun(
-    param_proposals[[1]], sim_nums[[1]],
-    orig, param, init, control, info
-  )
+  for (n in seq_along(updaters)) {
+    run_netsim_updaters_fun(
+      updaters[[n]], sim_nums[[n]],
+      orig, param, init, control, info
+    )
+    gc()
+  }
+  ## df <- readRDS(fs::path("remote_jobs/", job_name, paste0("slurm/out/df_sim", n, ".rds")))
+  ## tail(df[, 103:138])
+  ## print(names(df), max = 200)
 }
+
 
 # Create out dir and save params
 fs::dir_create(fs::path(paths$local_out, paths$jobs_dir))

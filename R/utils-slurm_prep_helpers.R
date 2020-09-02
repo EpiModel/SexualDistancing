@@ -60,10 +60,27 @@ run_netsim_fun <- function(param_proposal, sim_num,
   } else {
     saveRDS(sim, paste0(info$root_dir, "/out/", prefix, "sim", sim_num, ".rds"))
   }
+}
+
+run_netsim_updaters_fun <- function(updaters, sim_num,
+                           orig, param, init, control, info) {
+  library(EpiModelHIV)
+
+  param$param_updaters <- c(param$param_updaters, updaters)
+  sim <- netsim(orig, param, init, control)
+
+  prefix <- ""
+  if (!is.null(info$df_keep)){
+    prefix <- "df_"
+    df <- as.data.frame(sim)
+    df <- df[df$time > max(df$time) - info$df_keep, ]
+    saveRDS(df, paste0(info$root_dir, "/out/", prefix, "sim", sim_num, ".rds"))
+  } else {
+    saveRDS(sim, paste0(info$root_dir, "/out/", prefix, "sim", sim_num, ".rds"))
+  }
 
 
 }
-
 make_job_paths <- function(job_name, ssh_dir, ssh_host) {
   p <- list()
 
