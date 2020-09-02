@@ -3,10 +3,10 @@ source("R/utils-slurm_wf.R")
 test_simulation <- FALSE
 
 # Set slurm parameters ---------------------------------------------------------
-batch_per_set <- 5      # How many 28 replications to do per parameter
+batch_per_set <- 10      # How many 28 replications to do per parameter
 steps_to_keep <- 10 * 52 # Steps to keep in the output df. If NULL, return sim obj
-partition <- "csde"     # On hyak, either ckpt or csde
-job_name <- "SD_scenario_debug_small"
+partition <- "ckpt"     # On hyak, either ckpt or csde
+job_name <- "SD_scenario_debug_small2"
 ssh_host <- "hyak_mox"
 ssh_dir <- "gscratch/SexualDistancing/"
 
@@ -31,12 +31,12 @@ orig$epi <- lapply(names(tmp_epi$epi), function(n) orig$epi[[n]])
 names(orig$epi) <- names(tmp_epi$epi)
 
 # run 20 rng years before scenarios
-param$prep.start = orig$control$nsteps + 5 * 52 + 1
-param$riskh.start = param$prep.start - 52
+param$prep.start <- orig$control$nsteps + 5 * 52 + 1
+param$riskh.start <- param$prep.start - 52
 step_ana_start <- param$prep.start + 5 * 52
 step_interv_start <- step_ana_start + 1 * 52
-step_interv_stop <- step_interv_start + 2.5 * 52
-step_ana_stop <- step_interv_stop + 1.5 * 52
+step_interv_stop <- step_interv_start + 1.5 * 52
+step_ana_stop <- step_interv_stop + 2.5 * 52
 
 control <- control_msm(
   start = orig$control$nsteps + 1,
@@ -217,8 +217,8 @@ scenarios <- list(
     list(
       at = step_interv_start,
       param = list(
-        netresim.form.rr = rep(0.75, 3),
-        netresim.disl.rr = rep(0.75, 2),
+        netresim.form.rr = c(1, 0.25, 0.25),
+        netresim.disl.rr = c(1, 0.25),
         prep.start.prob = param$prep.start.prob * 0.5,
         prep.discont.rate = param$prep.discont.rate / 0.5,
         hiv.test.rate = param$hiv.test.rate * 0.5,
@@ -233,8 +233,8 @@ scenarios <- list(
     list(
       at = step_interv_start,
       param = list(
-        netresim.form.rr = rep(0.75, 3),
-        netresim.disl.rr = rep(0.75, 2),
+        netresim.form.rr = c(1, 0.25, 0.25),
+        netresim.disl.rr = c(1, 0.25),
         prep.start.prob = param$prep.start.prob * 0.1,
         prep.discont.rate = param$prep.discont.rate / 0.1,
         hiv.test.rate = param$hiv.test.rate * 0.1,
@@ -249,8 +249,8 @@ scenarios <- list(
     list(
       at = step_interv_start,
       param = list(
-        netresim.form.rr = rep(0.5, 3),
-        netresim.disl.rr = rep(0.5, 2),
+        netresim.form.rr = c(1, 0.5, 0.5),
+        netresim.disl.rr = c(1, 0.5),
         prep.start.prob = param$prep.start.prob * 0.5,
         prep.discont.rate = param$prep.discont.rate / 0.5,
         hiv.test.rate = param$hiv.test.rate * 0.5,
@@ -265,8 +265,8 @@ scenarios <- list(
     list(
       at = step_interv_start,
       param = list(
-        netresim.form.rr = rep(0.5, 3),
-        netresim.disl.rr = rep(05, 2),
+        netresim.form.rr = c(1, 0.5, 0.5),
+        netresim.disl.rr = c(1, 0.5),
         prep.start.prob = param$prep.start.prob * 0.1,
         prep.discont.rate = param$prep.discont.rate / 0.1,
         hiv.test.rate = param$hiv.test.rate * 0.1,
@@ -281,8 +281,8 @@ scenarios <- list(
     list(
       at = step_interv_start,
       param = list(
-        netresim.form.rr = rep(0.75, 3),
-        netresim.disl.rr = rep(0.75, 2),
+        netresim.form.rr = c(1, 0.25, 0.25),
+        netresim.disl.rr = c(1, 0.25),
         prep.start.prob = param$prep.start.prob * 0.5,
         prep.discont.rate = param$prep.discont.rate / 0.5,
         hiv.test.rate = param$hiv.test.rate * 0.5,
@@ -297,8 +297,8 @@ scenarios <- list(
     list(
       at = step_interv_start,
       param = list(
-        netresim.form.rr = rep(0.75, 3),
-        netresim.disl.rr = rep(0.75, 2),
+        netresim.form.rr = c(1, 0.25, 0.25),
+        netresim.disl.rr = c(1, 0.25),
         prep.start.prob = param$prep.start.prob * 0.1,
         prep.discont.rate = param$prep.discont.rate / 0.1,
         hiv.test.rate = param$hiv.test.rate * 0.1,
@@ -313,8 +313,8 @@ scenarios <- list(
     list(
       at = step_interv_start,
       param = list(
-        netresim.form.rr = rep(0.9, 3),
-        netresim.disl.rr = rep(0.9, 2),
+        netresim.form.rr = c(1, 0.1, 0.1),
+        netresim.disl.rr = c(1, 0.1),
         prep.start.prob = param$prep.start.prob * 0.5,
         prep.discont.rate = param$prep.discont.rate / 0.5,
         hiv.test.rate = param$hiv.test.rate * 0.5,
@@ -329,8 +329,8 @@ scenarios <- list(
     list(
       at = step_interv_start,
       param = list(
-        netresim.form.rr = rep(0.9, 3),
-        netresim.disl.rr = rep(0.9, 2),
+        netresim.form.rr = c(1, 0.1, 0.1),
+        netresim.disl.rr = c(1, 0.1),
         prep.start.prob = param$prep.start.prob * 0.1,
         prep.discont.rate = param$prep.discont.rate / 0.1,
         hiv.test.rate = param$hiv.test.rate * 0.1,
@@ -403,8 +403,8 @@ scenarios <- list(
     list(
       at = step_interv_start,
       param = list(
-        netresim.form.rr = rep(0.9, 3),
-        netresim.disl.rr = rep(0.9, 2),
+        netresim.form.rr = c(1, 0.1, 0.1),
+        netresim.disl.rr = c(1, 0.1),
         prep.start.prob = param$prep.start.prob * 0.1,
         prep.discont.rate = param$prep.discont.rate / 0.1,
         hiv.test.rate = param$hiv.test.rate * 0.1,

@@ -3,7 +3,7 @@ library(tidyverse)
 theme_set(theme_light())
 
 # One or many job_names
-job_names <- c("SD_")
+job_names <- c("")
 job_last_n <- 1 # if not NULL, get last N jobs. Otherwise, use job_names
 
 if (!is.null(job_last_n)) {
@@ -13,7 +13,7 @@ if (!is.null(job_last_n)) {
 jobs <- list()
 
 # Read targets
-prep_start <- 52 * (65 + 10) + 1
+prep_start <- 52 * (65 + 5) + 1
 ana_beg <- prep_start + 5 * 52
 int_beg <- ana_beg + 1 * 52
 int_end <- int_beg + 1.5 * 52
@@ -42,29 +42,38 @@ for (job in job_names) {
 }
 
 names(jobs[[1]]$infos$updaters)
+jobs[[1]]$infos$updaters[[2]]
 
 df <- as_tibble(jobs[[1]]$data)
+print(names(df), max = 200)
 
 df <- df %>%
   mutate(scenarios = names(jobs[[1]]$infos$updaters)[batch]) %>%
   group_by(scenarios, sim, time) %>%
   summarise(
-    prep_cov = ,
-    hiv_diag = ,
-    hiv_suppr = ,
-    sti_tx =
-  )
+    prep_cov = prepCurr / prepElig ,
+    hiv_diag = cc.dx,
+    hiv_suppr = cc.vsupp,
+    sti_tx = (gc.tx + ct.tx) / (gc + ct),
+    sti_inc = ir100.sti,
+    hiv_inc = ir100,
+    deg_main = main.deg,
+    deg_casl = casl.deg,
+    deg_inst = inst.deg
+  ) %>%
+  ungroup()
 
 # incid (how much pooling) and cumul incid
 
 
 df %>%
   filter(
-    time > ana_beg - 1,
-    scenarios %in% scenarios[grepl("ser_", scenarios)]) %>%
+    time > ana_beg,
+    !grepl("comb_", scenarios)
+  ) %>%
   group_by(scenarios, time) %>%
-  summarize(y = median(ir100, na.rm = TRUE)) %>%
+  summarize(y = median(deg_inst, na.rm = TRUE)) %>%
   ggplot(aes(x = time, y = y, col = scenarios)) +
     geom_smooth() +
-    geom_vline(xintercept = int_beg - 1) +
-    geom_vline(xintercept = int_end - 1)
+    geom_vline(xintercept = int_beg) +
+    geom_vline(xintercept = int_end)
