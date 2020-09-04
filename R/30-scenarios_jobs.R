@@ -6,7 +6,7 @@ test_simulation <- FALSE
 batch_per_set <- 10      # How many 28 replications to do per parameter
 steps_to_keep <- 10 * 52 # Steps to keep in the output df. If NULL, return sim obj
 partition <- "ckpt"     # On hyak, either ckpt or csde
-job_name <- "SD_scenario_debug_small2"
+job_name <- "SD_scenario_all"
 ssh_host <- "hyak_mox"
 ssh_dir <- "gscratch/SexualDistancing/"
 
@@ -31,7 +31,7 @@ orig$epi <- lapply(names(tmp_epi$epi), function(n) orig$epi[[n]])
 names(orig$epi) <- names(tmp_epi$epi)
 
 # run 20 rng years before scenarios
-param$prep.start <- orig$control$nsteps + 5 * 52 + 1
+param$prep.start <- orig$control$nsteps + 1 * 52 + 1
 param$riskh.start <- param$prep.start - 52
 step_ana_start <- param$prep.start + 5 * 52
 step_interv_start <- step_ana_start + 1 * 52
@@ -60,6 +60,7 @@ param$param_updaters <- list(
       prep.start.prob = param$prep.start.prob,
       prep.discont.rate = param$prep.discont.rate,
       tx.halt.part.prob = param$tx.halt.part.prob,
+      hiv.test.rate = param$hiv.test.rate,
       gc.sympt.prob.tx = param$gc.sympt.prob.tx,
       gc.asympt.prob.tx = param$gc.asympt.prob.tx,
       ct.sympt.prob.tx = param$ct.sympt.prob.tx,
@@ -179,7 +180,7 @@ scenarios <- list(
     list(
       at = step_interv_start,
       param = list(
-        tx.halt.part.prob = param$tx.halt.part.prob * 0.5
+        tx.halt.part.prob = param$tx.halt.part.prob / 0.5
       )
     )
   ),
@@ -187,7 +188,7 @@ scenarios <- list(
     list(
       at = step_interv_start,
       param = list(
-        tx.halt.part.prob = param$tx.halt.part.prob * 0.1
+        tx.halt.part.prob = param$tx.halt.part.prob / 0.1
       )
     )
   ),
@@ -222,6 +223,7 @@ scenarios <- list(
         prep.start.prob = param$prep.start.prob * 0.5,
         prep.discont.rate = param$prep.discont.rate / 0.5,
         hiv.test.rate = param$hiv.test.rate * 0.5,
+        tx.halt.part.prob = param$tx.halt.part.prob / 0.5,
         gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.5,
         gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.5,
         ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.5,
@@ -238,6 +240,7 @@ scenarios <- list(
         prep.start.prob = param$prep.start.prob * 0.1,
         prep.discont.rate = param$prep.discont.rate / 0.1,
         hiv.test.rate = param$hiv.test.rate * 0.1,
+        tx.halt.part.prob = param$tx.halt.part.prob / 0.1,
         gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.1,
         gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.1,
         ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.1,
@@ -254,6 +257,7 @@ scenarios <- list(
         prep.start.prob = param$prep.start.prob * 0.5,
         prep.discont.rate = param$prep.discont.rate / 0.5,
         hiv.test.rate = param$hiv.test.rate * 0.5,
+        tx.halt.part.prob = param$tx.halt.part.prob / 0.5,
         gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.5,
         gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.5,
         ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.5,
@@ -270,6 +274,7 @@ scenarios <- list(
         prep.start.prob = param$prep.start.prob * 0.1,
         prep.discont.rate = param$prep.discont.rate / 0.1,
         hiv.test.rate = param$hiv.test.rate * 0.1,
+        tx.halt.part.prob = param$tx.halt.part.prob / 0.1,
         gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.1,
         gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.1,
         ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.1,
@@ -286,6 +291,7 @@ scenarios <- list(
         prep.start.prob = param$prep.start.prob * 0.5,
         prep.discont.rate = param$prep.discont.rate / 0.5,
         hiv.test.rate = param$hiv.test.rate * 0.5,
+        tx.halt.part.prob = param$tx.halt.part.prob / 0.5,
         gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.5,
         gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.5,
         ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.5,
@@ -302,6 +308,7 @@ scenarios <- list(
         prep.start.prob = param$prep.start.prob * 0.1,
         prep.discont.rate = param$prep.discont.rate / 0.1,
         hiv.test.rate = param$hiv.test.rate * 0.1,
+        tx.halt.part.prob = param$tx.halt.part.prob / 0.1,
         gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.1,
         gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.1,
         ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.1,
@@ -318,6 +325,7 @@ scenarios <- list(
         prep.start.prob = param$prep.start.prob * 0.5,
         prep.discont.rate = param$prep.discont.rate / 0.5,
         hiv.test.rate = param$hiv.test.rate * 0.5,
+        tx.halt.part.prob = param$tx.halt.part.prob / 0.5,
         gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.5,
         gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.5,
         ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.5,
@@ -334,6 +342,7 @@ scenarios <- list(
         prep.start.prob = param$prep.start.prob * 0.1,
         prep.discont.rate = param$prep.discont.rate / 0.1,
         hiv.test.rate = param$hiv.test.rate * 0.1,
+        tx.halt.part.prob = param$tx.halt.part.prob / 0.1,
         gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.1,
         gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.1,
         ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.1,
@@ -344,78 +353,79 @@ scenarios <- list(
 )
 
 # small version ----------------------------------------------------------------
-scenarios <- list(
-  base = list(),
-  net_casl_09 = list(
-    list(
-      at = step_interv_start,
-      param = list(
-        netresim.form.rr = c(1, 0.1, 1),
-        netresim.disl.rr = c(1, 0.1)
-      )
-    )
-  ),
-  net_ot_09 = list(
-    list(
-      at = step_interv_start,
-      param = list(
-        netresim.form.rr = c(1, 1, 0.1)
-      )
-    )
-  ),
-  ser_prep_09 = list(
-    list(
-      at = step_interv_start,
-      param = list(
-        prep.start.prob = param$prep.start.prob * 0.1,
-        prep.discont.rate = param$prep.discont.rate / 0.1
-      )
-    )
-  ),
-  ser_scre_09 = list(
-    list(
-      at = step_interv_start,
-      param = list(
-        hiv.test.rate = param$hiv.test.rate * 0.1
-      )
-    )
-  ),
-  ser_art_09 = list(
-    list(
-      at = step_interv_start,
-      param = list(
-        tx.halt.part.prob = param$tx.halt.part.prob * 0.1
-      )
-    )
-  ),
-  ser_stitx_09 = list(
-    list(
-      at = step_interv_start,
-      param = list(
-        gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.1,
-        gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.1,
-        ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.1,
-        ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.1
-      )
-    )
-  ),
-  comb_09_09 = list(
-    list(
-      at = step_interv_start,
-      param = list(
-        netresim.form.rr = c(1, 0.1, 0.1),
-        netresim.disl.rr = c(1, 0.1),
-        prep.start.prob = param$prep.start.prob * 0.1,
-        prep.discont.rate = param$prep.discont.rate / 0.1,
-        hiv.test.rate = param$hiv.test.rate * 0.1,
-        gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.1,
-        gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.1,
-        ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.1,
-        ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.1
-      )
-    )
-  )
-)
+## scenarios <- list(
+##   base = list(),
+##   net_casl_09 = list(
+##     list(
+##       at = step_interv_start,
+##       param = list(
+##         netresim.form.rr = c(1, 0.1, 1),
+##         netresim.disl.rr = c(1, 0.1)
+##       )
+##     )
+##   ),
+##   net_ot_09 = list(
+##     list(
+##       at = step_interv_start,
+##       param = list(
+##         netresim.form.rr = c(1, 1, 0.1)
+##       )
+##     )
+##   ),
+##   ser_prep_09 = list(
+##     list(
+##       at = step_interv_start,
+##       param = list(
+##         prep.start.prob = param$prep.start.prob * 0.1,
+##         prep.discont.rate = param$prep.discont.rate / 0.1
+##       )
+##     )
+##   ),
+##   ser_scre_09 = list(
+##     list(
+##       at = step_interv_start,
+##       param = list(
+##         hiv.test.rate = param$hiv.test.rate * 0.1
+##       )
+##     )
+##   ),
+##   ser_art_09 = list(
+##     list(
+##       at = step_interv_start,
+##       param = list(
+##         tx.halt.part.prob = param$tx.halt.part.prob / 0.1
+##       )
+##     )
+##   ),
+##   ser_stitx_09 = list(
+##     list(
+##       at = step_interv_start,
+##       param = list(
+##         gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.1,
+##         gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.1,
+##         ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.1,
+##         ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.1
+##       )
+##     )
+##   ),
+##   comb_09_09 = list(
+##     list(
+##       at = step_interv_start,
+##       param = list(
+##         netresim.form.rr = c(1, 0.1, 0.1),
+##         netresim.disl.rr = c(1, 0.1),
+##         prep.start.prob = param$prep.start.prob * 0.1,
+##         prep.discont.rate = param$prep.discont.rate / 0.1,
+##         hiv.test.rate = param$hiv.test.rate * 0.1,
+##         tx.halt.part.prob = param$tx.halt.part.prob / 0.1,
+##         gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.1,
+##         gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.1,
+##         ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.1,
+##         ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.1
+##       )
+##     )
+##   )
+## )
 
 ## s/logistic(logit(\(.*\)) \+ log(\(.*\)))/\1 * \2/
 ## s/logistic(logit(\(.*\)) - log(\(.*\)))/\1 \/ \2/
@@ -455,6 +465,7 @@ slurm_wf_Map(
   FUN = run_netsim_updaters_fun ,
   sim_num = sim_nums,
   updaters = updaters,
+  scenario = names(updaters),
   MoreArgs = list(orig = orig, param = param, init = init, control = control,
                   info = info)
 )
@@ -463,17 +474,32 @@ if (test_simulation) {
   control$nsims <- 1
   control$ncores <- 1
   control$verbose <- FALSE
+  n <- 1
 
-  for (n in seq_along(updaters)) {
-    run_netsim_updaters_fun(
-      updaters[[n]], sim_nums[[n]],
-      orig, param, init, control, info
+  run_netsim_updaters_fun(
+    updaters[[n]], sim_nums[[n]], scenario = names(updaters)[[n]],
+    orig, param, init, control, info
+  )
+
+  df <- readRDS(fs::path("remote_jobs/", job_name,
+                         paste0("slurm/out/df_sim", n, ".rds")))
+  tail(df[, 103:138])
+  print(names(df), max = 200)
+  df <- df %>%
+    mutate(
+      prep_cov = prepCurr / prepElig ,
+      hiv_diag = cc.dx,
+      hiv_suppr = cc.vsupp,
+      sti_tx = (gc.tx + ct.tx) / (gc + ct),
+      sti_inc = ir100.sti,
+      hiv_inc = ir100,
+      deg_main = main.deg,
+      deg_casl = casl.deg,
+      deg_inst = inst.deg
     )
-    gc()
-  }
-  ## df <- readRDS(fs::path("remote_jobs/", job_name, paste0("slurm/out/df_sim", n, ".rds")))
-  ## tail(df[, 103:138])
-  ## print(names(df), max = 200)
+
+  ggplot(df, aes(x = time, y = sti_inc)) +
+    geom_line()
 }
 
 
@@ -506,4 +532,5 @@ scp_get_script <- c(
 writeLines(scp_send_script, fs::path(paths$local_job_dir, "send_to_ssh.sh"))
 writeLines(scp_get_script, fs::path(paths$local_job_dir, "get_from_ssh.sh"))
 
-write(job_name, file = fs::path(paths$local_out, paths$jobs_dir, "last_jobs"))
+write(job_name, file = fs::path(paths$local_out, paths$jobs_dir, "last_jobs"),
+       append = TRUE)
