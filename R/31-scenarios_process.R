@@ -108,10 +108,10 @@ df_scenar50 <- df %>%
   filter(time > ana_beg) %>%
   group_by(scenario, batch, sim) %>%
   summarise(
-    hiv_cum_inc = sum(hiv_inc) * 1e5 / 5200,
-    sti_cum_inc = sum(sti_inc) * 1e5 / 5200,
-    sti_gc_cum_inc = sum(sti_gc_inc) * 1e5 / 5200,
-    sti_ct_cum_inc = sum(sti_ct_inc) * 1e5 / 5200
+    hiv_cum_inc = mean(hiv_inc) * 5000,
+    sti_cum_inc = mean(sti_inc) * 5000,
+    sti_gc_cum_inc = mean(sti_gc_inc) * 5000,
+    sti_ct_cum_inc = mean(sti_ct_inc) * 5000
   ) %>%
   group_by(scenario) %>%
   summarise(across(-c(batch, sim),
@@ -132,3 +132,21 @@ df_scenar50 <- df %>%
   pivot_wider(names_from = name, values_from = formatted)
 
 saveRDS(df_scenar50, "out/remote_jobs/SD_scenario_all_big/df_scenar50.rds")
+
+df_table <- left_join(df_scenar25, df_scenar50, by = "scenario")
+
+
+library(metR)
+df_scenar <- readRDS("out/remote_jobs/SD_scenario_all_big/df_scenar.rds")
+
+df_contour <- df_scenar %>%
+  filter(
+    time == int_end,
+    scenario %in% c("base", scenario[grep("comb_", scenario)])) %>%
+  select(scenario, sti_inc__med, hiv_inc__med) %>%
+  mutate(scenario = if_else(scenario == "base", "base_00_00", scenario)) %>%
+  separate(scenario, into = c(NA, "ser", "net"), "_") %>%
+  mutate(across(c(ser, net), ~ as.numeric(str_pad(.x, 3, "right", "0"))))
+
+ggplot(df_contour, aes(x = ser, y = net, z = hiv_inc__med)) +
+  geom_contour_fill(na.fill = TRUE)
