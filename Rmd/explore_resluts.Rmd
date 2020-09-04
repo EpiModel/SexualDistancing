@@ -1,0 +1,136 @@
+---
+title: "Result Exploration"
+output: 
+  html_document: 
+    code_folding: hide
+    toc: true
+    toc_float: true
+    number_sections: true
+    smart: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(knitr.kable.NA = "")
+
+library(tidyverse)
+library(kableExtra)
+theme_set(theme_light())
+
+prep_start <- 52 * (65 + 1) + 1
+ana_beg <- prep_start + 5 * 52
+int_beg <- ana_beg + 1 * 52
+int_end <- int_beg + 1.5 * 52
+ana_end <- int_end + 2.5 * 52
+
+df_scenar <- readRDS(here::here("out/remote_jobs/SD_scenario_full/df_scenar.rds"))
+df_scenar25 <- readRDS(here::here("out/remote_jobs/SD_scenario_full/df_scenar25.rds"))
+df_scenar50 <- readRDS(here::here("out/remote_jobs/SD_scenario_full/df_scenar50.rds"))
+
+line_grph <- function(y) {
+  for (grp in c("net_", "ser_", "comb_", "")){
+    scenarios <- c(
+      "base",
+      unique(df_scenar$scenario)[grep(grp, unique(df_scenar$scenario))]
+    )
+
+    p <- df_scenar %>%
+      filter(
+        scenario %in% scenarios,
+        time > ana_beg
+      ) %>%
+      ggplot(aes(x = time, y = {{ y }} , col = scenario)) +
+      geom_line() +
+      geom_vline(xintercept = int_beg) +
+      geom_vline(xintercept = int_end)
+
+    print(p)
+  }
+}
+```
+
+# Tables
+
+```{r}
+left_join(df_scenar25, df_scenar50, by = "scenario") %>%
+  kable() %>%
+  kable_styling(bootstrap_options = "striped")
+```
+
+# Graphics
+
+## STI 
+
+### GC incidence 
+
+```{r}
+line_grph(sti_gc_inc__med)
+```
+
+### CT incidence 
+
+```{r}
+line_grph(sti_ct_inc__med)
+```
+
+
+### STI incidence 
+
+```{r}
+line_grph(sti_inc__med)
+```
+
+### STI treatment 
+
+```{r}
+line_grph(sti_tx__med)
+```
+
+## PrEP
+
+### PrEP Coverage
+
+```{r}
+line_grph(prep_cov__med)
+```
+
+## HIV
+
+### HIV incidence 
+
+```{r}
+line_grph(hiv_inc__med)
+```
+
+### HIV Diagnosis
+
+```{r}
+line_grph(hiv_diag__med)
+```
+
+### HIV suppr 
+
+```{r}
+line_grph(hiv_suppr__med)
+```
+
+## Degrees
+
+### Degree main 
+
+```{r}
+line_grph(deg_main__med)
+```
+
+### Degree casual 
+
+```{r}
+line_grph(deg_casl__med)
+```
+
+### Degree inst 
+
+```{r}
+line_grph(deg_inst__med)
+```
+
