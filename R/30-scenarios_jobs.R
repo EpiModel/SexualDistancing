@@ -3,10 +3,10 @@ source("R/utils-slurm_wf.R")
 test_simulation <- FALSE
 
 # Set slurm parameters ---------------------------------------------------------
-batch_per_set <- 10      # How many 28 replications to do per parameter
+batch_per_set <- 20      # How many 28 replications to do per parameter
 steps_to_keep <- 10 * 52 # Steps to keep in the output df. If NULL, return sim obj
 partition <- "ckpt"     # On hyak, either ckpt or csde
-job_name <- "SD_scenario_all"
+job_name <- "SD_scenario_all_big"
 ssh_host <- "hyak_mox"
 ssh_dir <- "gscratch/SexualDistancing/"
 

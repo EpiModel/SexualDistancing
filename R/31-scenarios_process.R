@@ -33,10 +33,26 @@ for (job in job_names) {
   for (fle in sim_files) {
     btch <- btch + 1
     sim <- readRDS(fle)
-    dff <- if (is.null(infos$df_keep)) as.data.frame(sim) else sim
+    dff <- if (is.null(infos$df_keep)) as_tibble(sim) else sim
 
-    setDT(dff)
-    dff[, batch := btch]
+    dff$batch <- btch
+    dff <- dff %>%
+      group_by(scenario, batch, sim, time) %>%
+      summarise(
+        prep_cov = prepCurr / prepElig ,
+        hiv_diag = cc.dx,
+        hiv_suppr = cc.vsupp,
+        sti_tx = (gc.tx + ct.tx) / (gc + ct),
+        sti_inc = ir100.sti,
+        sti_gc_inc = ir100.gc,
+        sti_ct_inc = ir100.ct,
+        hiv_inc = ir100,
+        deg_main = main.deg,
+        deg_casl = casl.deg,
+        deg_inst = inst.deg
+      ) %>%
+      ungroup() %>%
+      fill(sti_inc, hiv_inc)
 
     jobs[[job]]$data <- rbind(jobs[[job]]$data, dff)
   }
@@ -45,63 +61,74 @@ for (job in job_names) {
 names(jobs[[1]]$infos$updaters)
 jobs[[1]]$infos$updaters[[2]]
 
-as_tibble(jobs[[1]]$data)
+df <-as_tibble(jobs[[1]]$data)
 print(names(df), max = 200)
 
 my_roll <- function(x) {
   roll_mean(x, n = 4, align = "right", fill = NA)
 }
 
-df <- as_tibble(jobs[[1]]$data) %>%
-  ## group_by(scenarios, sim, time) %>%
-  group_by(scenario, time) %>%
-  summarise(
-    prep_cov = prepCurr / prepElig ,
-    hiv_diag = cc.dx,
-    hiv_suppr = cc.vsupp,
-    sti_tx = (gc.tx + ct.tx) / (gc + ct),
-    sti_inc = ir100.sti,
-    hiv_inc = ir100,
-    deg_main = main.deg,
-    deg_casl = casl.deg,
-    deg_inst = inst.deg
-  ) %>%
-  ungroup() %>%
-  fill(sti_inc, hiv_inc)
-
-df <- readRDS("out/remote_jobs/SD_scenario_all/df.rds")
+saveRDS(df, "out/remote_jobs/SD_scenario_all_big/df.rds")
+## df <- readRDS("out/remote_jobs/SD_scenario_all_big/df.rds")
 
 df_scenar <- df %>%
   group_by(scenario, time) %>%
-  summarise(across(
+  summarise(across(-c(batch, sim),
     .fns = list(
       p025 = ~ quantile(.x, probs = 0.025, na.rm = TRUE),
       med = ~ median(.x, na.rm = TRUE),
       p975 = ~ quantile(.x, probs = 0.975, na.rm = TRUE)
-    )
+    ),
+    .names = "{col}__{fn}"
   )) %>%
   mutate(across(starts_with("sti_"), ~ roll_meanr(.x, 4, fill = NA))) %>%
   mutate(across(starts_with("hiv_suppr_"), ~ roll_meanr(.x, 8, fill = NA))) %>%
   mutate(across(starts_with("hiv_inc_"), ~ roll_meanr(.x, 8, fill = NA)))
 
+saveRDS(df_scenar, "out/remote_jobs/SD_scenario_all_big/df_scenar.rds")
+## df_scenar <- readRDS("out/remote_jobs/SD_scenario_all_big/df_scenar.rds")
 
-df_scenar %>%
-  filter(
-    !grepl("comb_", scenario),
-    !grepl("ser_", scenario),
-    !grepl("net_", scenario),
-    ## scenarios == "base",
-    time > ana_beg
+fmtr <- scales::label_number(0.01)
+
+df_scenar25 <- df_scenar %>%
+  filter(time == int_end) %>%
+  select(-time) %>%
+  pivot_longer(cols = -scenario) %>%
+  separate(name, sep = "__", into = c("name", "measure")) %>%
+  pivot_wider(names_from = measure, values_from = value) %>%
+  mutate(formatted = paste0(
+    fmtr(med), " (", fmtr(p025), ", ", fmtr(p975), ")")
+    ) %>%
+  select(-c(p025, med, p975)) %>%
+  pivot_wider(names_from = name, values_from = formatted)
+
+saveRDS(df_scenar25, "out/remote_jobs/SD_scenario_all_big/df_scenar25.rds")
+
+df_scenar50 <- df %>%
+  filter(time > ana_beg) %>%
+  group_by(scenario, batch, sim) %>%
+  summarise(
+    hiv_cum_inc = sum(hiv_inc) * 1e5 / 5200,
+    sti_cum_inc = sum(sti_inc) * 1e5 / 5200,
+    sti_gc_cum_inc = sum(sti_gc_inc) * 1e5 / 5200,
+    sti_ct_cum_inc = sum(sti_ct_inc) * 1e5 / 5200
   ) %>%
-  ggplot(aes(x = time, y = deg_inst_med , col = scenario)) +
-    geom_line() +
-    geom_vline(xintercept = int_beg) +
-    geom_vline(xintercept = int_end)
+  group_by(scenario) %>%
+  summarise(across(-c(batch, sim),
+    .fns = list(
+      p025 = ~ quantile(.x, probs = 0.025, na.rm = TRUE),
+      med = ~ median(.x, na.rm = TRUE),
+      p975 = ~ quantile(.x, probs = 0.975, na.rm = TRUE)
+    ),
+    .names = "{col}__{fn}"
+  )) %>%
+  pivot_longer(cols = -scenario) %>%
+  separate(name, sep = "__", into = c("name", "measure")) %>%
+  pivot_wider(names_from = measure, values_from = value) %>%
+  mutate(formatted = paste0(
+    fmtr(med), " (", fmtr(p025), ", ", fmtr(p975), ")")
+    ) %>%
+  select(-c(p025, med, p975)) %>%
+  pivot_wider(names_from = name, values_from = formatted)
 
-
-df %>%
-  filter(scenarios == "base") %>%
-  pivot_longer(cols = -c(scenarios, time)) %>%
-  ggplot(aes(x = time, y = value)) +
-    geom_line() +
-    facet_grid(rows = vars(name), scales = "free")
+saveRDS(df_scenar50, "out/remote_jobs/SD_scenario_all_big/df_scenar50.rds")
