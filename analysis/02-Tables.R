@@ -17,8 +17,9 @@ table(df$scenario)
 ## Table 1
 
 scen <- "base"
-scen <- "net_casl_09"
-var <- "sti_inc"
+scen <- "net_casl_05"
+var <- "hiv_inc"
+roll <- 4
 
 calc_quants_ir(df, scen = scen, var = var,
                t.start = int_end-8, t.end = int_end,
@@ -28,12 +29,24 @@ calc_quants_ci(df, scen = scen, var = var,
                t.start = ana_beg, t.end = ana_end,
                qnt.low = 0.25, qnt.high = 0.75, round = 1)
 
+calc_quants_ia(df, base.scen = "base", comp.scen = scen, var = var,
+               t.start = ana_beg, t.end = ana_end,
+               qnt.low = 0.025, qnt.high = 0.975,
+               nsims = 1000, round.nia = 1, round.pia = 1)
+
 h1 <- create_var_df(df, scen, var)
 h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
-h3 <- apply_roll(h2, 1)
-plot(h3[, 1], type = "l", ylim = c(0, 30), col = 2)
+h3 <- apply_roll(h2, roll)
+plot(h3[, 1], type = "l", ylim = c(0, 3), col = 2)
 draw_quants(h3, col = adjustcolor(2, alpha.f = 0.5))
 abline(v = c(int_beg-ana_beg, int_end-ana_beg), lty = 2)
+
+h1 <- create_var_df(df, scen = "base", var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+lines(h3[, 1], type = "l", ylim = c(0, 3), col = 4)
+draw_quants(h3, col = adjustcolor(4, alpha.f = 0.5))
+# abline(v = c(int_beg-ana_beg, int_end-ana_beg), lty = 2)
 
 
 

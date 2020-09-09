@@ -87,8 +87,8 @@ calc_quants_ci <- function(x, scen, var, t.start, t.end,
 calc_quants_ia <- function(x, base.scen, comp.scen, var,
                            t.start, t.end,
                            qnt.low = 0.025, qnt.high = 0.975,
-                           nsims = 1000, round.nia = 1, round.pia = 1,
-                           ) {
+                           nsims = 1000, round.nia = 1, round.pia = 1) {
+
   vec.nia <- rep(NA, nsims)
   vec.pia <- rep(NA, nsims)
 
