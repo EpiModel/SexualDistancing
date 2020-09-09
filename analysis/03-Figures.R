@@ -14,6 +14,26 @@ library("metR")
 
 # Figure 1 ----------------------------------------------------------------
 
+scen <- "base"
+scen <- "ser_prep_09"
+var <- "hiv_inc"
+roll <- 4
+
+h1 <- create_var_df(df, scen, var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+plot(h3[, 1], type = "l", ylim = c(0, 5), col = 2)
+draw_quants(h3, col = adjustcolor(2, alpha.f = 0.5))
+abline(v = c(int_beg-ana_beg, int_end-ana_beg), lty = 2)
+
+h1 <- create_var_df(df, scen = "base", var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+lines(h3[, 1], type = "l", ylim = c(0, 3), col = 4)
+draw_quants(h3, col = adjustcolor(4, alpha.f = 0.5))
+# abline(v = c(int_beg-ana_beg, int_end-ana_beg), lty = 2)
+
+
 # Run on Hyak
 
 ci_contour_df <- function(sims) {
