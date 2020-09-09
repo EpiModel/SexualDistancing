@@ -1,73 +1,66 @@
 
 ## Exploratory and Data Processing
 
-# One or many job_names
-job_names <- c("SD_scenario_debug_small2")
-job_last_n <- 1 # if not NULL, get last N jobs. Otherwise, use job_names
+fn <- list.files("analysis/data", pattern = "df_", full.names = TRUE)
+# df1 <- readRDS(fn[1])
 
-if (!is.null(job_last_n)) {
-  job_names <- tail(readLines("out/remote_jobs/last_jobs"), job_last_n)
-}
-
-jobs <- list()
-
-# Read targets
-prep_start <- 52 * (65 + 1) + 1
-ana_beg <- prep_start + 5 * 52
-int_beg <- ana_beg + 1 * 52
-int_end <- int_beg + 1.5 * 52
-ana_end <- int_end + 2.5 * 52
-
-for (job in job_names) {
-  jobs[[job]] <- list()
-  infos <- readRDS(fs::path("out/remote_jobs/", job, "job_info.rds"))
-  jobs[[job]]$infos <- infos
-
-  out_dir <- fs::path(infos$paths$local_job_dir, "out")
-
-  sim_files <- fs::dir_ls(out_dir, regexp = "\\d*.rds")
-  jobs[[job]]$data <- data.table()
-  btch <- 0
-  for (fle in sim_files) {
-    btch <- btch + 1
-    sim <- readRDS(fle)
-    dff <- if (is.null(infos$df_keep)) as_tibble(sim) else sim
-
-    dff$batch <- btch
-    dff <- dff %>%
-      group_by(scenario, batch, sim, time) %>%
-      summarise(
-        prep_cov = prepCurr / prepElig ,
-        hiv_diag = cc.dx,
-        hiv_suppr = cc.vsupp,
-        sti_tx = (gc.tx + ct.tx) / (gc + ct),
-        sti_inc = ir100.sti,
-        sti_gc_inc = ir100.gc,
-        sti_ct_inc = ir100.ct,
-        hiv_inc = ir100,
-        deg_main = main.deg,
-        deg_casl = casl.deg,
-        deg_inst = inst.deg
-      ) %>%
-      ungroup() %>%
-      fill(sti_inc, hiv_inc)
-
-    jobs[[job]]$data <- rbind(jobs[[job]]$data, dff)
+btch <- 0
+for (i in seq_along(fn)) {
+  btch <- btch + 1
+  dft <- readRDS(fn[i])
+  # dft <- dplyr::select(dft, var.names)
+  prep_cov = dft$prepCurr / dft$prepElig
+  hiv_diag = dft$cc.dx
+  hiv_suppr = dft$cc.vsupp
+  sti_tx = (dft$gc.tx + dft$ct.tx) / (dft$gc + dft$ct)
+  sti_inc = dft$ir100.sti
+  sti_gc_inc = dft$ir100.gc
+  sti_ct_inc = dft$ir100.ct
+  hiv_inc = dft$ir100
+  deg_main = dft$main.deg
+  deg_casl = dft$casl.deg
+  deg_inst = dft$inst.deg
+  dft2 <- data.frame(sim = dft$sim,
+                     batch = btch,
+                     time = dft$time,
+                     scenario = dft$scenario,
+                     prep_cov, hiv_diag, hiv_suppr, sti_tx, sti_inc, sti_gc_inc,
+                     sti_ct_inc, hiv_inc, deg_main, deg_casl, deg_inst)
+  if (i == 1) {
+    df <- dft2
+  } else {
+    df <- rbind(df, dft2)
   }
+  cat(i, "/", length(fn), "... ", sep = "")
 }
+dim(df)
 
-names(jobs[[1]]$infos$updaters)
-jobs[[1]]$infos$updaters[[2]]
+saveRDS(df, file = "analysis/data/df.rds")
 
-df <-as_tibble(jobs[[1]]$data)
-print(names(df), max = 200)
 
+df <- readRDS("analysis/data/df.rds")
+dim(df)
+head(df)
+table(df$scenario)
+
+
+
+
+
+
+
+
+
+
+
+library("RcppRoll")
 my_roll <- function(x) {
   roll_mean(x, n = 4, align = "right", fill = NA)
 }
 
-saveRDS(df, fs::path("out/remote_jobs/", job, "/df.rds"))
-## df <- readRDS(fs::path("out/remote_jobs/", job, "/df.rds"))
+
+
+
 
 df_scenar <- df %>%
   group_by(scenario, time) %>%
