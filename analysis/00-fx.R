@@ -10,7 +10,7 @@ create_var_df <- function(df, scen, var) {
                     names_from = c(sim, batch),
                     values_from = var,
                     names_prefix = "s",
-                    names_sep = "")
+                    names_sep = ".")
   tt <- as.data.frame(tt)
   return(tt)
 }
@@ -35,12 +35,14 @@ apply_roll <- function(x, n) {
 }
 
 
-calc_quants_prev <- function(x, var, at = 520, mult = 1, round = 1,
+calc_quants_prev <- function(x, scen, var, at, mult = 1, round = 1,
                              qnt.low = 0.025, qnt.high = 0.975) {
-  if (is.null(x$epi[[var]])) {
+  if (is.null(x[[var]])) {
     stop("var ", var, " does not exist on x", call. = FALSE)
   }
-  out <- as.numeric(x$epi[[var]][at, ])*mult
+  x <- create_var_df(x, scen, var)
+  row.at <- which(x$time == at)
+  out <- as.numeric(x[row.at, ])*mult
   out <- quantile(out, c(0.5, qnt.low, qnt.high), names = FALSE)
   format <- paste0("%.", round, "f")
   out <- sprintf(format, out)
