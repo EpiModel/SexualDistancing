@@ -1,7 +1,7 @@
 
-library("dplyr")
-library("tidyr")
 source("analysis/00-fx.R")
+
+par(mar = c(3,3,1,1), mgp = c(2,1,0))
 
 # Date targets
 prep_start <- 52 * (65 + 1) + 1
@@ -11,24 +11,29 @@ int_end <- int_beg + 1.5 * 52
 ana_end <- int_end + 2.5 * 52
 
 df <- readRDS("~/data/SexDist/df.rds")
+df <- filter(df, time >= ana_beg)
+table(df$scenario)
 
 ## Table 1
 
 scen <- "base"
-var <- "hiv_inc"
+scen <- "net_casl_09"
+var <- "sti_inc"
 
 calc_quants_ir(df, scen = scen, var = var,
                t.start = int_end-8, t.end = int_end,
                qnt.low = 0.25, qnt.high = 0.75)
 
+calc_quants_ci(df, scen = scen, var = var,
+               t.start = ana_beg, t.end = ana_end,
+               qnt.low = 0.25, qnt.high = 0.75, round = 1)
+
 h1 <- create_var_df(df, scen, var)
 h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
-
-par(mar = c(3,3,1,1), mgp = c(2,1,0))
-plot(h2[, 1], type = "l", ylim = c(0, 3), col = 2)
-draw_quants(h2, col = adjustcolor(2, alpha.f = 0.5))
+h3 <- apply_roll(h2, 1)
+plot(h3[, 1], type = "l", ylim = c(0, 30), col = 2)
+draw_quants(h3, col = adjustcolor(2, alpha.f = 0.5))
 abline(v = c(int_beg-ana_beg, int_end-ana_beg), lty = 2)
-
 
 
 

@@ -1,4 +1,7 @@
 
+suppressPackageStartupMessages(library("dplyr"))
+suppressPackageStartupMessages(library("tidyr"))
+
 create_var_df <- function(df, scen, var) {
   tt <- filter(df, scenario == scen)
   tt <- select(tt, c("sim", "batch", "time", var))
@@ -22,6 +25,13 @@ draw_quants <- function(x, col) {
   xx <- c(1:(nrow(x)), (nrow(x)):1)
   yy <- c(x[, 2], rev(x[, 3]))
   polygon(xx, yy, col = col, border = NA)
+}
+
+apply_roll <- function(x, n) {
+  for (j in 1:ncol(x)) {
+    x[, j] <- RcppRoll::roll_meanr(x[, j], n = n)
+  }
+  return(x)
 }
 
 
@@ -50,32 +60,52 @@ calc_quants_ir <- function(x, scen, var, t.start, t.end,
   x <- x[row.start:row.end, -1]
   out <- as.numeric(colMeans(x))
   out <- quantile(out, c(0.5, qnt.low, qnt.high), names = FALSE)
-  out <- sprintf("%.2f", out)
+  format <- paste0("%.", round, "f")
+  out <- sprintf(format, out)
   out <- paste0(out[1], " (", out[2], ", ", out[3], ")")
   return(out)
 }
 
-
-calc_quants_hr <- function(x.base, x.comp, var, qnt.low = 0.025, qnt.high = 0.975, nsims = 1000) {
-  vec <- rep(NA, nsims)
-  numer.start <- unname(colMeans(tail(x.comp$epi[[var]], 52)))
-  denom.start <- unname(colMeans(tail(x.base$epi[[var]], 52)))
-  for (i in 1:nsims) {
-    numer <- sample(numer.start)
-    denom <- sample(denom.start)
-    vec[i] <- median(numer/denom, na.rm = TRUE)
+calc_quants_ci <- function(x, scen, var, t.start, t.end,
+                           qnt.low = 0.025, qnt.high = 0.975, round = 2) {
+  if (is.null(x[[var]])) {
+    stop("var ", var, " does not exist on x", call. = FALSE)
   }
-  out <- quantile(vec, c(0.5, qnt.low, qnt.high), names = FALSE)
-  out <- sprintf("%.2f", out)
+  x <- create_var_df(x, scen, var)
+  row.start <- which(x$time == t.start)
+  row.end <- which(x$time == t.end)
+  x <- x[row.start:row.end, -1]
+  out <- as.numeric(colSums(x))
+  out <- quantile(out, c(0.5, qnt.low, qnt.high), names = FALSE)
+  format <- paste0("%.", round, "f")
+  out <- sprintf(format, out)
   out <- paste0(out[1], " (", out[2], ", ", out[3], ")")
   return(out)
 }
 
-calc_quants_ia <- function(x.base, x.comp, var, qnt.low = 0.025, qnt.high = 0.975, nsims = 1000) {
+
+calc_quants_ia <- function(x, base.scen, comp.scen, var,
+                           t.start, t.end,
+                           qnt.low = 0.025, qnt.high = 0.975,
+                           nsims = 1000, round.nia = 1, round.pia = 1,
+                           ) {
   vec.nia <- rep(NA, nsims)
   vec.pia <- rep(NA, nsims)
-  incid.comp.start <- unname(colSums(x.comp$epi[[var]]))
-  incid.base.start <- unname(colSums(x.base$epi[[var]]))
+
+  x.base <- create_var_df(x, base.scen, var)
+  x.comp <- create_var_df(x, comp.scen, var)
+
+  row.start.base <- which(x.base$time == t.start)
+  row.end.base <- which(x.base$time == t.end)
+  row.start.comp <- which(x.comp$time == t.start)
+  row.end.comp <- which(x.comp$time == t.end)
+
+  x.base <- x.base[row.start.base:row.end.base, -1]
+  x.comp <- x.comp[row.start.comp:row.end.comp, -1]
+
+  incid.comp.start <- unname(colSums(x.comp))
+  incid.base.start <- unname(colSums(x.base))
+
   for (i in 1:nsims) {
     incid.comp <- sample(incid.comp.start)
     incid.base <- sample(incid.base.start)
@@ -83,11 +113,13 @@ calc_quants_ia <- function(x.base, x.comp, var, qnt.low = 0.025, qnt.high = 0.97
     vec.pia[i] <- median((incid.base - incid.comp) / incid.base)
   }
   nia <- quantile(vec.nia, c(0.5, qnt.low, qnt.high), names = FALSE)
-  nia <- sprintf("%.1f", nia)
+  format <- paste0("%.", round.nia, "f")
+  nia <- sprintf(format, nia)
   nia <- paste0(nia[1], " (", nia[2], ", ", nia[3], ")")
 
   pia <- quantile(vec.pia, c(0.5, qnt.low, qnt.high), names = FALSE)*100
-  pia <- sprintf("%.1f", pia)
+  format <- paste0("%.", round.pia, "f")
+  pia <- sprintf(format, pia)
   pia <- paste0(pia[1], " (", pia[2], ", ", pia[3], ")")
 
   out <- list()
@@ -96,56 +128,6 @@ calc_quants_ia <- function(x.base, x.comp, var, qnt.low = 0.025, qnt.high = 0.97
 
   return(out)
 }
-
-calc_quants_nnt <- function(x.base, x.comp, var.tests, var.incid,
-                            qnt.low = 0.025, qnt.high = 0.975, nsims = 1000) {
-
-  tt.comp.start <- unname(colSums(x.comp$epi[[var.tests]], na.rm = TRUE))
-  tt.base.start <- unname(colSums(x.base$epi[[var.tests]], na.rm = TRUE))
-
-  incid.comp.start <- unname(colSums(x.comp$epi[[var.incid]], na.rm = TRUE))
-  incid.base.start <- unname(colSums(x.base$epi[[var.incid]], na.rm = TRUE))
-
-  vec.nnt <- rep(NA, nsims)
-
-  for (i in 1:nsims) {
-    samp.comp <- sample(1:length(tt.comp.start))
-    samp.base <- sample(1:length(tt.base.start))
-    vec.nnt[i] <- median((tt.comp.start[samp.comp] - tt.base.start[samp.base]) /
-                         (incid.base.start[samp.base] - incid.comp.start[samp.comp]))
-  }
-
-  out <- quantile(vec.nnt, c(0.5, qnt.low, qnt.high), na.rm = TRUE, names = FALSE)
-  out <- sprintf("%.0f", out)
-  out <- paste0(out[1], " (", out[2], ", ", out[3], ")")
-
-  return(out)
-}
-
-# setwd("intervention/")
-# load("intervention/data/sim.n1000.rda")
-# x.base <- sim
-#
-# load("intervention/data/sim.n1007.rda")
-# x.comp <- sim
-#
-# calc_quants_nnt(x.base, x.comp, "tot.tests.W", "incid.W")
-#
-# var.tests = "tot.tests.W"
-# var.incid = "incid.W"
-
-# df <- as.data.frame(sim.base, out = "mean")
-# names(df)
-# df$newDx
-# df$newDx45
-# df$newDx140
-# df$newDx200
-# df$newDx2y
-
-
-# df <- as.data.frame(sim.comp, out = "mean")
-
-
 
 
 epi_stats <- function(sim.base,
