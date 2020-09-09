@@ -4,8 +4,8 @@ library(RcppRoll)
 theme_set(theme_light())
 
 # One or many job_names
-job_names <- c("SD_scenario_debug_small2")
-job_last_n <- 1 # if not NULL, get last N jobs. Otherwise, use job_names
+job_names <- c("SD_scenario_full")
+job_last_n <- NULL # if not NULL, get last N jobs. Otherwise, use job_names
 
 if (!is.null(job_last_n)) {
   job_names <- tail(readLines("out/remote_jobs/last_jobs"), job_last_n)
