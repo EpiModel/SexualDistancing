@@ -165,6 +165,13 @@
       "Repository": "CRAN",
       "Hash": "9fcf8f42726ef53839d9b1d5ca44285f"
     },
+    "RcppRoll": {
+      "Package": "RcppRoll",
+      "Version": "0.3.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "84a03997fbb5acfb3c9b43bad88fea1f"
+    },
     "SparseM": {
       "Package": "SparseM",
       "Version": "1.78",
