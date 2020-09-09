@@ -57,7 +57,7 @@ for (ii in 1:length(scenario_set)) {
   for (jj in 1:length(epi_vars)) {
     temp <- calc_quants_ir(df, scen = scenario_set[[ii]], var = epi_vars[[jj]],
                            t.start = int_end-4, t.end = int_end,
-                           qnt.low = qlow, qnt.high = qhigh)
+                           qnt.low = qlow, qnt.high = qhigh, round = 2)
     rr <- c(rr, temp)
     temp <- calc_quants_ci(df, scenario_set[[ii]], var = epi_vars[[jj]],
                            t.start = ana_beg, t.end = ana_end,
@@ -75,7 +75,8 @@ for (ii in 1:length(scenario_set)) {
   rr <- do.call("c", rr)
   t1[[ii]] <- rr
 }
-t1 <- as.data.frame(do.call("rbind", t1))
+t1 <- as.data.frame(cbind(scenario_set,
+  do.call("rbind", t1)))
 
 readr::write_csv(t1, "analysis/T1.csv")
 
