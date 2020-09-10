@@ -121,3 +121,46 @@ for (ii in 1:length(scenario_set)) {
 t2 <- as.data.frame(cbind(scenario_set, do.call("rbind", t2)))
 
 readr::write_csv(t2, "analysis/T2.csv")
+
+
+## Table 3
+
+scenario_set <- c("base",
+                  "comb_025_05", "comb_025_09",
+                  "comb_05_05", "comb_05_09",
+                  "comb_075_05", "comb_075_09",
+                  "comb_09_05", "comb_09_09")
+epi_vars <- c("hiv_inc", "sti_inc", "sti_gc_inc", "sti_ct_inc")
+proc_vars <- c("prep_cov", "hiv_diag", "hiv_suppr", "sti_tx")
+
+qlow <- 0.025
+qhigh <- 0.975
+
+t3 <- list()
+for (ii in 1:length(scenario_set)) {
+  rr <- list()
+  for (jj in 1:length(epi_vars)) {
+    temp <- calc_quants_ir(df, scen = scenario_set[[ii]], var = epi_vars[[jj]],
+                           t.start = int_end-4, t.end = int_end,
+                           qnt.low = qlow, qnt.high = qhigh, round = 2)
+    rr <- c(rr, temp)
+    temp <- calc_quants_ci(df, scenario_set[[ii]], var = epi_vars[[jj]],
+                           t.start = ana_beg, t.end = ana_end,
+                           qnt.low = qlow, qnt.high = qhigh, round = 1)
+    rr <- c(rr, temp)
+  }
+  for (kk in 1:length(proc_vars)) {
+    temp <- calc_quants_prev(df, scen = scenario_set[[ii]],
+                             var = proc_vars[[kk]],
+                             at = int_end,
+                             mult = 1, round = 2,
+                             qnt.low = qlow, qnt.high = qhigh)
+    rr <- c(rr, temp)
+  }
+  rr <- do.call("c", rr)
+  t3[[ii]] <- rr
+}
+t3 <- as.data.frame(cbind(scenario_set, do.call("rbind", t3)))
+t3
+
+readr::write_csv(t3, "analysis/T3.csv")
