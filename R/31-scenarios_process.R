@@ -70,6 +70,7 @@ my_roll <- function(x) {
 
 saveRDS(df, fs::path("out/remote_jobs/", job, "/df.rds"))
 ## df <- readRDS(fs::path("out/remote_jobs/", job, "/df.rds"))
+df <- readRDS(fs::path("out/df_comb.rds"))
 
 df_scenar <- df %>%
   group_by(scenario, time) %>%
@@ -85,8 +86,8 @@ df_scenar <- df %>%
   mutate(across(starts_with("hiv_suppr_"), ~ roll_meanr(.x, 8, fill = NA))) %>%
   mutate(across(starts_with("hiv_inc_"), ~ roll_meanr(.x, 8, fill = NA)))
 
-saveRDS(df_scenar, fs::path("out/remote_jobs/", job, "/df_scenar.rds"))
-## df_scenar <- readRDS(fs::path("out/remote_jobs/", job, "/df_scenar.rds"))
+saveRDS(df_scenar, fs::path("out/df_scenar.rds"))
+## df_scenar <- readRDS(fs::path("out/df_scenar.rds"))
 
 fmtr <- scales::label_number(0.01)
 
@@ -102,8 +103,8 @@ df_scenar25 <- df_scenar %>%
   select(-c(p025, med, p975)) %>%
   pivot_wider(names_from = name, values_from = formatted)
 
-saveRDS(df_scenar25, fs::path("out/remote_jobs/", job, "/df_scenar25.rds"))
-## df_scenar25 <- readRDS(fs::path("out/remote_jobs/", job, "/df_scenar25.rds"))
+saveRDS(df_scenar25, fs::path("out/df_scenar25.rds"))
+## df_scenar25 <- readRDS(fs::path("out/df_scenar25.rds"))
 
 df_scenar50 <- df %>%
   filter(time > ana_beg) %>%
@@ -132,14 +133,14 @@ df_scenar50 <- df %>%
   select(-c(p025, med, p975)) %>%
   pivot_wider(names_from = name, values_from = formatted)
 
-saveRDS(df_scenar50, fs::path("out/remote_jobs/", job, "/df_scenar50.rds"))
-## df_scenar50 <- readRDS(fs::path("out/remote_jobs/", job, "/df_scenar50.rds"))
+saveRDS(df_scenar50, fs::path("out/df_scenar50.rds"))
+## df_scenar50 <- readRDS(fs::path("out/df_scenar50.rds"))
 
 df_table <- left_join(df_scenar25, df_scenar50, by = "scenario")
 
 
 library(metR)
-df_scenar <- readRDS("out/remote_jobs/SD_scenario_all_big/df_scenar.rds")
+df_scenar <- readRDS("out/df_scenar.rds")
 
 df_contour <- df_scenar %>%
   filter(
