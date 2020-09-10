@@ -70,6 +70,7 @@ param$param_updaters <- list(
 
 
 # Scenarios --------------------------------------------------------------------
+# requires the time variables (step_ana_start, etc)
 source("R/utils-scenarios.R")
 
 scenarios <- scenarios[c("base")]

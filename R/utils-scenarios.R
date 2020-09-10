@@ -1,5 +1,13 @@
 scenarios <- list(
   base = list(),
+  base_no_prep = list(
+    list(
+      at = param$prep.start,
+      param = list(
+        prep.start.prob = 0,
+      )
+    )
+  ),
   net_all_025 = list(
     list(
       at = step_interv_start,
