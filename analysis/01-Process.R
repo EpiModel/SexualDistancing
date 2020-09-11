@@ -20,18 +20,21 @@ for (i in seq_along(fn)) {
   deg_main = dft$main.deg
   deg_casl = dft$casl.deg
   deg_inst = dft$inst.deg
+  sti.n.tx = dft$gc.tx + dft$ct.tx
+  sti.n.tot = dft$gc + dft$ct
   dft2 <- data.frame(sim = dft$sim,
                      batch = btch,
                      time = dft$time,
                      scenario = dft$scenario,
                      prep_cov, hiv_diag, hiv_suppr, sti_tx, sti_inc, sti_gc_inc,
-                     sti_ct_inc, hiv_inc, deg_main, deg_casl, deg_inst)
+                     sti_ct_inc, hiv_inc, deg_main, deg_casl, deg_inst,
+                     sti.n.tot, sti.n.tx)
   if (i == 1) {
     df <- dft2
   } else {
     df <- rbind(df, dft2)
   }
-  cat(i, "/", length(fn), "... ", sep = "")
+  cat(i, "/", length(fn), "...\n ", sep = "")
 }
 dim(df)
 

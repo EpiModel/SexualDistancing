@@ -3,15 +3,14 @@ library(tidyverse)
 scenario_map <- readRDS("out/scenario_map.rds")
 
 job_names <- c(
-  "SD_025",
-  "SD_net_casl_09",
-  "SD_base_no_prep",
-  "SD_net_casl_05"
+  ## "SD_025",
+  ## "SD_net_casl_09",
+  "SD_base_no_prep"
+  ## "SD_net_casl_05"
 )
 
-job <- job_names[[2]]
 jobs <- list()
-i <- 1
+i <- 3
 
 for (job in job_names) {
   jobs[[job]] <- list()
@@ -33,29 +32,13 @@ for (job in job_names) {
     p_sce <- sim$param$param_updaters[2]
     p_sce <- if (is.null(p_sce[[1]])) list() else p_sce
 
-    scenario <- scenario_map[[job]][[fs::path_file(fle)]]
+    scenario <- "base_no_prep"
 
     dff <- as_tibble(sim)
 
     dff <- dff %>%
       filter(time >= 3642) %>%
-      mutate(batch = btch, scenario = scenario) %>%
-      group_by(scenario, batch, sim, time) %>%
-      summarise(
-        prep_cov = prepCurr / prepElig ,
-        hiv_diag = cc.dx,
-        hiv_suppr = cc.vsupp,
-        sti_tx = (gc.tx + ct.tx) / (gc + ct),
-        sti_inc = ir100.sti,
-        sti_gc_inc = ir100.gc,
-        sti_ct_inc = ir100.ct,
-        hiv_inc = ir100,
-        deg_main = main.deg,
-        deg_casl = casl.deg,
-        deg_inst = inst.deg
-      ) %>%
-      ungroup() %>%
-      fill(sti_inc, hiv_inc)
+      mutate(batch = btch, scenario = scenario)
 
     jobs[[job]]$data <- bind_rows(jobs[[job]]$data, dff)
     saveRDS(dff, fs::path("out/remote_jobs/", job,
