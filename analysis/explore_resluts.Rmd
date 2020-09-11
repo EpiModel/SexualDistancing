@@ -23,9 +23,9 @@ int_beg <- ana_beg + 1 * 52
 int_end <- int_beg + 1.5 * 52
 ana_end <- int_end + 2.5 * 52
 
-df_scenar <- readRDS(here::here("out/remote_jobs/SD_scenario_full/df_scenar.rds"))
-df_scenar25 <- readRDS(here::here("out/remote_jobs/SD_scenario_full/df_scenar25.rds"))
-df_scenar50 <- readRDS(here::here("out/remote_jobs/SD_scenario_full/df_scenar50.rds"))
+df_scenar <- readRDS(here::here("out/df_scenar.rds"))
+df_scenar25 <- readRDS(here::here("out/df_scenar25.rds"))
+df_scenar50 <- readRDS(here::here("out/df_scenar50.rds"))
 
 line_grph <- function(y) {
   for (grp in c("net_", "ser_", "comb_", "")){
