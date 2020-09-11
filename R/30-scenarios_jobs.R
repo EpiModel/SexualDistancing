@@ -1,12 +1,12 @@
 source("R/utils-slurm_prep_helpers.R") # requires `purrr`
 source("R/utils-slurm_wf.R")
-test_simulation <- FALSE
+test_simulation <- TRUE
 
 # Set slurm parameters ---------------------------------------------------------
 batch_per_set <- 20      # How many 28 replications to do per parameter
 steps_to_keep <- NULL#6 * 52 # Steps to keep in the output df. If NULL, return sim obj
 partition <- "csde"     # On hyak, either ckpt or csde
-job_name <- stop("set a job_name")#"SD_fillme"
+job_name <- "SD_fillme"
 ssh_host <- "hyak_mox"
 ssh_dir <- "gscratch/SexualDistancing/"
 
@@ -26,9 +26,9 @@ lnt <- TRUE # if FALSE: set `require.lnt` to FALSE and adjust ` prep.start.prob`
 source("R/utils-sim_calib_params.R", local = TRUE)
 
 orig <- readRDS("out/est/restart.rds")
-tmp_epi <- readRDS("out/est/tmp_epi.rds")
-orig$epi <- lapply(names(tmp_epi$epi), function(n) orig$epi[[n]])
-names(orig$epi) <- names(tmp_epi$epi)
+## tmp_epi <- readRDS("out/est/tmp_epi.rds")
+## orig$epi <- lapply(names(tmp_epi$epi), function(n) orig$epi[[n]])
+## names(orig$epi) <- names(tmp_epi$epi)
 
 # run 20 rng years before scenarios
 param$prep.start <- orig$control$nsteps + 1 * 52 + 1

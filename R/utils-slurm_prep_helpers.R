@@ -26,11 +26,6 @@ make_relative_params <- function(param_proposals, relative_params) {
   })
 }
 
-# Helper functions for other purposes
-# use qlogis & plogis instead
-logit <- function(p) log(p / (1 - p))
-logistic <- function(x) 1 / (1 + exp(-x))
-
 run_netsim_fun <- function(param_proposal, sim_num,
                            orig, param, init, control, info) {
   library(EpiModelHIV)

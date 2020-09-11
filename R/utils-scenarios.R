@@ -4,7 +4,7 @@ scenarios <- list(
     list(
       at = param$prep.start,
       param = list(
-        prep.start.prob = 0,
+        prep.start.prob = 0
       )
     )
   ),
