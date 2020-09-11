@@ -1,58 +1,133 @@
 
+## SexDist Figures
 
-## CombPrev Figures
 
-library("EpiModelHIV")
-library("ARTnet")
+# Setup -------------------------------------------------------------------
+
+rm(list=ls())
+
 library("dplyr")
-library("foreach")
-
 library("ggplot2")
 library("viridis")
 library("metR")
 
+source("analysis/00-fx.R")
+
+par(mar = c(3,3,1,1), mgp = c(2,1,0))
+
+# Date targets
+prep_start <- 52 * (65 + 1) + 1
+ana_beg <- prep_start + 5 * 52
+int_beg <- ana_beg + 1 * 52
+int_end <- int_beg + 1.5 * 52
+ana_end <- int_end + 2.5 * 52
+
+df <- readRDS("~/data/SexDist/df.rds")
+df <- filter(df, time >= ana_beg)
+table(df$scenario)
+
 
 # Figure 1 ----------------------------------------------------------------
 
-scen <- "base"
-scen <- "ser_prep_09"
+jpeg("analysis/Fig1A.jpeg", height = 5, width = 10, units = "in", res = 300)
+
+par(mar = c(3,3,1,1), mgp = c(2,1,0))
+
+## HIV panel
 var <- "hiv_inc"
 roll <- 4
 
+scen <- "ser_all_09"
 h1 <- create_var_df(df, scen, var)
 h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
 h3 <- apply_roll(h2, roll)
-plot(h3[, 1], type = "l", ylim = c(0, 5), col = 2)
-draw_quants(h3, col = adjustcolor(2, alpha.f = 0.5))
+plot(h3[, 1], type = "l", ylim = c(0, 5), col = 2, lwd = 2, lty = 1,
+     xlab = "Week", ylab = "HIV IR per 100 PYAR")
+draw_quants(h3, col = adjustcolor(2, alpha.f = 0.1))
 abline(v = c(int_beg-ana_beg, int_end-ana_beg), lty = 2)
 
 h1 <- create_var_df(df, scen = "base", var)
 h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
 h3 <- apply_roll(h2, roll)
-lines(h3[, 1], type = "l", ylim = c(0, 3), col = 4)
-draw_quants(h3, col = adjustcolor(4, alpha.f = 0.5))
+lines(h3[, 1], type = "l", col = 1, lwd = 2)
+draw_quants(h3, col = adjustcolor(1, alpha.f = 0.1))
 # abline(v = c(int_beg-ana_beg, int_end-ana_beg), lty = 2)
 
+scen <- "net_all_09"
+h1 <- create_var_df(df, scen = scen, var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+lines(h3[, 1], type = "l", col = 3, lwd = 2, lty = 1)
+draw_quants(h3, col = adjustcolor(3, alpha.f = 0.1))
 
-# Run on Hyak
+scen <- "comb_09_09"
+h1 <- create_var_df(df, scen = scen, var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+lines(h3[, 1], type = "l", col = 4, lwd = 2, lty = 1)
+draw_quants(h3, col = adjustcolor(4, alpha.f = 0.1))
 
-ci_contour_df <- function(sims) {
-  doParallel::registerDoParallel(parallel::detectCores() - 1)
-  df <- foreach(i = seq_along(sims)) %dopar% {
-    fn <- list.files("data/", pattern = as.character(sims[i]), full.names = TRUE)
-    load(fn)
-    incid <- unname(colSums(sim$epi$incid, na.rm = TRUE))
-    new.df <- data.frame(scenario = sims[i],
-                         incid = incid,
-                         p1 = sim$param$MULT1,
-                         p2 = sim$param$MULT2,
-                         lnt = sim$param$prep.require.lnt)
-    return(new.df)
-  }
-  doParallel::stopImplicitCluster()
-  df <- do.call("rbind", df)
-  return(df)
-}
+legend("topright",
+       legend = c("No Change", "Sexual Distancing Only",
+                  "Service Reduction Only", "Combined"),
+       lwd = 2.5, lty = 1, col = c(1, 3, 2, 4), bty = "n", cex = 0.8)
+
+text(36, 4.9, "COVID Start", cex = 0.8)
+text(115, 4.9, "COVID End", cex = 0.8)
+
+dev.off()
+
+## STI panel
+
+jpeg("analysis/Fig1B.jpeg", height = 5, width = 10, units = "in", res = 300)
+
+par(mar = c(3,3,1,1), mgp = c(2,1,0))
+
+var <- "sti_inc"
+roll <- 4
+
+scen <- "ser_all_09"
+h1 <- create_var_df(df, scen, var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+plot(h3[, 1], type = "l", ylim = c(0, 100), col = 2, lwd = 2,
+     xlab = "Week", ylab = "STI IR per 100 PYAR")
+draw_quants(h3, col = adjustcolor(2, alpha.f = 0.1))
+abline(v = c(int_beg-ana_beg, int_end-ana_beg), lty = 2)
+
+h1 <- create_var_df(df, scen = "base", var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+lines(h3[, 1], type = "l", col = 1, lwd = 2)
+draw_quants(h3, col = adjustcolor(1, alpha.f = 0.1))
+# abline(v = c(int_beg-ana_beg, int_end-ana_beg), lty = 2)
+
+scen <- "net_all_09"
+h1 <- create_var_df(df, scen = scen, var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+lines(h3[, 1], type = "l", col = 3, lwd = 2)
+draw_quants(h3, col = adjustcolor(3, alpha.f = 0.1))
+
+scen <- "comb_09_09"
+h1 <- create_var_df(df, scen = scen, var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+lines(h3[, 1], type = "l", col = 4, lwd = 2, lty = 1)
+draw_quants(h3, col = adjustcolor(4, alpha.f = 0.1))
+
+legend("topright",
+       legend = c("No Change", "Sexual Distancing Only",
+                  "Service Reduction Only", "Combined"),
+       lwd = 2.5, lty = 1, col = c(1, 3, 2, 4), bty = "n", cex = 0.8)
+
+text(36, 96, "COVID Start", cex = 0.8)
+text(115, 96, "COVID End", cex = 0.8)
+
+dev.off()
+
+
+
 
 fig1 <- ci_contour_df(6000:6721)
 table(fig1$p1, fig1$p2, fig1$lnt)

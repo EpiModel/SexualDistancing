@@ -1,7 +1,6 @@
 
 source("analysis/00-fx.R")
 
-par(mar = c(3,3,1,1), mgp = c(2,1,0))
 
 # Date targets
 prep_start <- 52 * (65 + 1) + 1
