@@ -10,7 +10,21 @@ int_end <- int_beg + 1.5 * 52
 ana_end <- int_end + 2.5 * 52
 
 df <- readRDS("~/data/SexDist/df.rds")
+dim(df)
+
 df <- filter(df, time >= ana_beg)
+dim(df)
+
+table(df$scenario)
+
+# limit net_casl_05 to 560 sims
+length(unique(df$batch[df$scenario == "base"]))
+length(unique(df$batch[df$scenario == "net_casl_05"]))
+netCasl05.batches <- unique(df$batch[df$scenario == "net_casl_05"])
+df1 <- filter(df, scenario == "net_casl_05" & batch %in% netCasl05.batches[1:20])
+df2 <- filter(df, scenario != "net_casl_05")
+df <- rbind(df2, df1)
+
 table(df$scenario)
 
 ## Test outcomes
