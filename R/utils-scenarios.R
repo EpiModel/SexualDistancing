@@ -35,12 +35,66 @@ scenarios <- list(
       )
     )
   ),
+  ## net_casl_025 = list(
+  ##   list(
+  ##     at = step_interv_start,
+  ##     param = list(
+  ##       netresim.form.rr = c(1, 0.75, 1),
+  ##       netresim.disl.rr = c(1, 10)
+  ##     )
+  ##   )
+  ## ),
+  ## net_casl_05 = list(
+  ##   list(
+  ##     at = step_interv_start,
+  ##     param = list(
+  ##       netresim.form.rr = c(1, 0.5, 1),
+  ##       netresim.disl.rr = c(1, 10)
+  ##     )
+  ##   )
+  ## ),
+  ## net_casl_09 = list(
+  ##   list(
+  ##     at = step_interv_start,
+  ##     param = list(
+  ##       netresim.form.rr = c(1, 0.1, 1),
+  ##       netresim.disl.rr = c(1, 10)
+  ##     )
+  ##   )
+  ## ),
+  ## net_casl_1 = list(
+  ##   list(
+  ##     at = step_interv_start,
+  ##     param = list(
+  ##       netresim.form.rr = c(1, 0, 1),
+  ##       netresim.disl.rr = c(1, 10)
+  ##     )
+  ##   )
+  ## ),
+  net_casl_005 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = c(1, 0.95, 1),
+        netresim.disl.rr = c(1, 1/0.95)
+      )
+    )
+  ),
+  net_casl_01 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = c(1, 0.9, 1),
+        netresim.disl.rr = c(1, 1/0.9)
+      )
+    )
+  ),
   net_casl_025 = list(
     list(
       at = step_interv_start,
       param = list(
         netresim.form.rr = c(1, 0.75, 1),
-        netresim.disl.rr = c(1, 10)
+        netresim.disl.rr = c(1, 1/0.75)
       )
     )
   ),
@@ -49,7 +103,7 @@ scenarios <- list(
       at = step_interv_start,
       param = list(
         netresim.form.rr = c(1, 0.5, 1),
-        netresim.disl.rr = c(1, 10)
+        netresim.disl.rr = c(1, 1/0.5)
       )
     )
   ),
@@ -58,7 +112,7 @@ scenarios <- list(
       at = step_interv_start,
       param = list(
         netresim.form.rr = c(1, 0.1, 1),
-        netresim.disl.rr = c(1, 10)
+        netresim.disl.rr = c(1, 1/0.1)
       )
     )
   ),
@@ -67,7 +121,7 @@ scenarios <- list(
       at = step_interv_start,
       param = list(
         netresim.form.rr = c(1, 0, 1),
-        netresim.disl.rr = c(1, 10)
+        netresim.disl.rr = c(1, Inf)
       )
     )
   ),

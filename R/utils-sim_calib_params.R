@@ -28,6 +28,8 @@ param <- param_msm(
   aids.mr = 1 / 250,
   trans.scale =  c(2.7, 0.35, 0.243), #c(2.21, 0.405, 0.255),
   acts.scale = 1.00,
+  acts.scale.main = 1.00,
+  acts.scale.casl = 1.00,
   acts.aids.vl = 5.75,
   circ.prob = c(0.874, 0.874, 0.918),
   a.rate = 0.00052,
