@@ -55,9 +55,9 @@ calc_quants_ia(df, base.scen = "base", comp.scen = scen, var = var,
 ## Table 1
 
 scenario_set <- c("base",
-                  "net_all_05", "net_all_09",
-                  "net_casl_05", "net_casl_09", "net_casl_1",
-                  "net_ot_05", "net_ot_09", "net_ot_1")
+                  "net_all_025", "net_all_05", "net_all_09",
+                  "net_casl_025", "net_casl_05", "net_casl_09", "net_casl_1",
+                  "net_ot_025", "net_ot_05", "net_ot_09", "net_ot_1")
 epi_vars <- c("hiv_inc", "sti_inc", "sti_gc_inc", "sti_ct_inc")
 proc_vars <- c("deg_main", "deg_casl", "deg_inst")
 
@@ -96,11 +96,11 @@ readr::write_csv(t1, "analysis/T1.csv")
 ## Table 2
 
 scenario_set <- c("base",
-                  "ser_all_05", "ser_all_09",
-                  "ser_prep_05", "ser_prep_09",
-                  "ser_scre_05", "ser_scre_09",
-                  "ser_art_05", "ser_art_09",
-                  "ser_stitx_05", "ser_stitx_09")
+                  "ser_all_025", "ser_all_05", "ser_all_09",
+                  "ser_prep_025", "ser_prep_05", "ser_prep_09",
+                  "ser_scre_025", "ser_scre_05", "ser_scre_09",
+                  "ser_art_025", "ser_art_05", "ser_art_09",
+                  "ser_stitx_025", "ser_stitx_05", "ser_stitx_09")
 epi_vars <- c("hiv_inc", "sti_inc", "sti_gc_inc", "sti_ct_inc")
 proc_vars <- c("prep_cov", "hiv_diag", "hiv_suppr", "sti_tx")
 
