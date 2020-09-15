@@ -3,10 +3,10 @@ source("R/utils-slurm_wf.R")
 test_simulation <- TRUE
 
 # Set slurm parameters ---------------------------------------------------------
-batch_per_set <- 20      # How many 28 replications to do per parameter
+batch_per_set <- 4      # How many 28 replications to do per parameter
 steps_to_keep <- 6 * 52 # Steps to keep in the output df. If NULL, return sim obj
 partition <- "csde"     # On hyak, either ckpt or csde
-job_name <- "SD_net_caslunew"
+job_name <- "SD_sens_ana1"
 ssh_host <- "hyak_mox"
 ssh_dir <- "gscratch/SexualDistancing/"
 
@@ -73,8 +73,10 @@ param$param_updaters <- list(
 # requires the time variables (step_ana_start, etc)
 source("R/utils-scenarios.R")
 
-## scenarios <- scenarios[grepl("net_all", names(scenarios))]
-scenarios <- scenarios["net_casl_1"]
+scenarios <- sens_scenarios
+param$param_updaters <- NULL
+## scenarios <- scenarios[grepl("comb_025", names(scenarios))]
+## scenarios <- scenarios["net_casl_1"]
 
 # Automatic --------------------------------------------------------------------
 #
