@@ -1,7 +1,7 @@
 
 ## Exploratory and Data Processing
 
-fn <- list.files("analysis/data", pattern = "df_", full.names = TRUE)
+fn <- list.files("analysis/data", pattern = "df_", full.names = TRUE, recursive = TRUE)
 # df1 <- readRDS(fn[1])
 
 btch <- 0

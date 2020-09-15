@@ -83,12 +83,12 @@
       "Version": "1.5.0",
       "Source": "GitHub",
       "RemoteType": "github",
-      "RemoteUsername": "EpiModel",
-      "RemoteRepo": "EpiModelHIV-p",
-      "RemoteRef": "SexualDistancing",
-      "RemoteSha": "97f4c0940439415de38553b1fd288a92194a616d",
       "RemoteHost": "api.github.com",
-      "Hash": "3b599bb8d84d7cfc91f324b4a5f7970b"
+      "RemoteRepo": "EpiModelHIV-p",
+      "RemoteUsername": "EpiModel",
+      "RemoteRef": "SexualDistancing",
+      "RemoteSha": "81fdb3cb9f9b77c21e8e34cfdb227722f3dab6a6",
+      "Hash": "67586aa02dc16f9011b42503bb63548a"
     },
     "EpiModelHPC": {
       "Package": "EpiModelHPC",
