@@ -1,8 +1,11 @@
 
 ## Exploratory and Data Processing
 
-fn <- list.files("analysis/data", pattern = "df_", full.names = TRUE, recursive = TRUE)
+fn <- list.files("analysis/data", pattern = "df_sim", full.names = TRUE, recursive = TRUE)
 # df1 <- readRDS(fn[1])
+
+# To process only a subset:
+## fn <- fn[grepl("net_casl_1", fn)]
 
 btch <- 0
 for (i in seq_along(fn)) {
@@ -45,6 +48,7 @@ df <- readRDS("analysis/data/df.rds")
 dim(df)
 head(df)
 table(df$scenario)
+unique(table(df$scenario))
 
 
 

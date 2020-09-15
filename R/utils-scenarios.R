@@ -8,12 +8,39 @@ scenarios <- list(
       )
     )
   ),
+  ## net_all_025 = list(
+  ##   list(
+  ##     at = step_interv_start,
+  ##     param = list(
+  ##       netresim.form.rr = c(1, 0.75, 0.75),
+  ##       netresim.disl.rr = c(1, 10)
+  ##       )
+  ##   )
+  ## ),
+  ## net_all_05 = list(
+  ##   list(
+  ##     at = step_interv_start,
+  ##     param = list(
+  ##       netresim.form.rr = c(1, 0.5, 0.5),
+  ##       netresim.disl.rr = c(1, 10)
+  ##       )
+  ##   )
+  ## ),
+  ## net_all_09 = list(
+  ##   list(
+  ##     at = step_interv_start,
+  ##     param = list(
+  ##       netresim.form.rr = c(1, 0.1, 0.1),
+  ##       netresim.disl.rr = c(1, 10)
+  ##     )
+  ##   )
+  ## ),
   net_all_025 = list(
     list(
       at = step_interv_start,
       param = list(
         netresim.form.rr = c(1, 0.75, 0.75),
-        netresim.disl.rr = c(1, 10)
+        netresim.disl.rr = c(1, 1/0.75)
         )
     )
   ),
@@ -22,7 +49,7 @@ scenarios <- list(
       at = step_interv_start,
       param = list(
         netresim.form.rr = c(1, 0.5, 0.5),
-        netresim.disl.rr = c(1, 10)
+        netresim.disl.rr = c(1, 1/0.5)
         )
     )
   ),
@@ -31,7 +58,7 @@ scenarios <- list(
       at = step_interv_start,
       param = list(
         netresim.form.rr = c(1, 0.1, 0.1),
-        netresim.disl.rr = c(1, 10)
+        netresim.disl.rr = c(1, 1/0.1)
       )
     )
   ),
@@ -121,7 +148,7 @@ scenarios <- list(
       at = step_interv_start,
       param = list(
         netresim.form.rr = c(1, 0, 1),
-        netresim.disl.rr = c(1, Inf)
+        netresim.disl.rr = c(1, 10)
       )
     )
   ),
