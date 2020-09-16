@@ -274,6 +274,23 @@ scenarios <- list(
       )
     )
   ),
+  comb_025_025 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = c(1, 0.75, 0.75),
+        netresim.disl.rr = c(1, 1/0.75),
+        prep.start.prob = param$prep.start.prob * 0.75,
+        prep.discont.rate = param$prep.discont.rate / 0.75,
+        hiv.test.rate = param$hiv.test.rate * 0.75,
+        tx.halt.part.prob = param$tx.halt.part.prob / 0.75,
+        gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.75,
+        gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.75,
+        ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.75,
+        ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.75
+      )
+    )
+  ),
   comb_025_05 = list(
     list(
       at = step_interv_start,
@@ -305,6 +322,23 @@ scenarios <- list(
         gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.1,
         ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.1,
         ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.1
+      )
+    )
+  ),
+  comb_05_025 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = c(1, 0.5, 0.5),
+        netresim.disl.rr = c(1, 1/0.5),
+        prep.start.prob = param$prep.start.prob * 0.75,
+        prep.discont.rate = param$prep.discont.rate / 0.75,
+        hiv.test.rate = param$hiv.test.rate * 0.75,
+        tx.halt.part.prob = param$tx.halt.part.prob / 0.75,
+        gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.75,
+        gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.75,
+        ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.75,
+        ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.75
       )
     )
   ),
@@ -342,6 +376,23 @@ scenarios <- list(
       )
     )
   ),
+  comb_075_025 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = c(1, 0.25, 0.25),
+        netresim.disl.rr = c(1, 1/0.25),
+        prep.start.prob = param$prep.start.prob * 0.75,
+        prep.discont.rate = param$prep.discont.rate / 0.75,
+        hiv.test.rate = param$hiv.test.rate * 0.75,
+        tx.halt.part.prob = param$tx.halt.part.prob / 0.75,
+        gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.75,
+        gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.75,
+        ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.75,
+        ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.75
+      )
+    )
+  ),
   comb_075_05 = list(
     list(
       at = step_interv_start,
@@ -373,6 +424,23 @@ scenarios <- list(
         gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.1,
         ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.1,
         ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.1
+      )
+    )
+  ),
+  comb_09_025 = list(
+    list(
+      at = step_interv_start,
+      param = list(
+        netresim.form.rr = c(1, 0.1, 0.1),
+        netresim.disl.rr = c(1, 1/0.1),
+        prep.start.prob = param$prep.start.prob * 0.75,
+        prep.discont.rate = param$prep.discont.rate / 0.75,
+        hiv.test.rate = param$hiv.test.rate * 0.75,
+        tx.halt.part.prob = param$tx.halt.part.prob / 0.75,
+        gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.75,
+        gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.75,
+        ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.75,
+        ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.75
       )
     )
   ),
