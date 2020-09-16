@@ -480,6 +480,20 @@
       "Repository": "CRAN",
       "Hash": "8c04112383ca1988e96f429255f95675"
     },
+    "future": {
+      "Package": "future",
+      "Version": "1.18.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "7f6e18b431939ccf2b4667d406a1f33e"
+    },
+    "future.apply": {
+      "Package": "future.apply",
+      "Version": "1.6.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "2efcc8bc4e401067f1e8b7f63ca726c9"
+    },
     "generics": {
       "Package": "generics",
       "Version": "0.0.2",
@@ -493,6 +507,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "4ded8b439797f7b1693bd3d238d0106b"
+    },
+    "globals": {
+      "Package": "globals",
+      "Version": "0.12.5",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "e9e529fb7a579ad4b4ff65e052e76ed8"
     },
     "glue": {
       "Package": "glue",
@@ -626,6 +647,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "361811f31f71f8a617a9a68bf63f1f42"
+    },
+    "listenv": {
+      "Package": "listenv",
+      "Version": "0.8.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "0bde42ee282efb18c7c4e63822f5b4f7"
     },
     "locfit": {
       "Package": "locfit",
@@ -802,10 +830,15 @@
     },
     "patchwork": {
       "Package": "patchwork",
-      "Version": "1.0.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "d6b817898a400e82e6777d4f7e027100"
+      "Version": "1.0.0.9000",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "patchwork",
+      "RemoteUsername": "thomasp85",
+      "RemoteRef": "master",
+      "RemoteSha": "012fb8bb7ba07d3ba4717536e43471828dca61fb",
+      "Hash": "8926b2b0f38d19890ed4121ad1d25330"
     },
     "pillar": {
       "Package": "pillar",
