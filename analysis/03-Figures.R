@@ -10,6 +10,7 @@ library("dplyr")
 library("ggplot2")
 library("viridis")
 library("metR")
+library("patchwork")
 
 source("analysis/00-fx.R")
 
@@ -220,6 +221,61 @@ dev.off()
 dfs <- readRDS("~/data/SexDist/df_sensi.rds")
 dfs <- filter(dfs, time >= ana_beg)
 table(dfs$scenario)
+
+
+dfs1 <- group_by(dfs, sim, batch, scenario) %>%
+  summarise(hivCI = sum(hiv_inc),
+            stiCI = sum(sti_inc))
+
+table(dfs1$scenario)
+
+n1 <- strsplit(dfs1$scenario, "_")
+net <- rep(NA, length(n1))
+ser <- rep(NA, length(n1))
+
+for (i in 1:length(n1)) {
+  net[i] <- as.numeric(strsplit(n1[[i]][2], "net")[[1]][2])
+  ser[i] <- as.numeric(strsplit(n1[[i]][3], "ser")[[1]][2])
+}
+
+dfs1$net <- net
+dfs1$ser <- ser
+
+dfs1 <- filter(dfs1, net > 0 & ser > 0)
+dfs1$net <- as.factor(dfs1$net)
+dfs1$ser <- as.factor(dfs1$ser)
+
+
+p1 <- ggplot(dfs1, aes(ser, hivCI)) +
+  geom_boxplot(aes(fill = net), outlier.shape = NA, alpha = 0.75, position = position_dodge(1)) +
+  scale_fill_brewer(palette = "Set1") +
+  theme_bw()
+p1
+
+# ggplot(dfs1, aes(ser, hivCI)) +
+#   geom_violin(aes(fill = net), alpha = 0.75, position = position_dodge(1)) +
+#   scale_fill_brewer(palette = "Set1") +
+#   theme_bw()
+
+# ggsave("analysis/Figure2a.jpeg", device = "jpeg", height = 6, width = 12, units = "in")
+
+p2 <- ggplot(dfs1, aes(ser, stiCI)) +
+  geom_boxplot(aes(fill = net), outlier.shape = NA, alpha = 0.75, position = position_dodge(1)) +
+  scale_fill_brewer(palette = "Set1") +
+  theme_bw()
+p2
+
+# ggplot(dfs1, aes(ser, stiCI)) +
+#   geom_violin(aes(fill = net), alpha = 0.75, position = position_dodge(1)) +
+#   scale_fill_brewer(palette = "Set1") +
+#   theme_bw()
+
+
+
+p1/p2
+
+ggsave("analysis/Figure2.jpeg", device = "jpeg", height = 6, width = 12, units = "in")
+
 
 
 
