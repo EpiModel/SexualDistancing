@@ -6,7 +6,7 @@ test_simulation <- FALSE
 batch_per_set <- 20      # How many 28 replications to do per parameter
 steps_to_keep <- 6 * 52 # Steps to keep in the output df. If NULL, return sim obj
 partition <- "csde"     # On hyak, either ckpt or csde
-job_name <- "SD_comb_N_25"
+job_name <- "SD_3_18"
 ssh_host <- "hyak_mox"
 ssh_dir <- "gscratch/SexualDistancing/"
 
@@ -74,8 +74,8 @@ param$param_updaters <- list(
 source("R/utils-scenarios.R")
 
 ## scenarios <- sens_scenarios
-scenarios <- scenarios[grepl("comb_[0-9]+_025", names(scenarios))]
-## scenarios <- scenarios["net_casl_1"]
+## scenarios <- scenarios[grepl("comb_[0-9]+_025", names(scenarios))]
+scenarios <- scenarios_3_18
 
 # Automatic --------------------------------------------------------------------
 #

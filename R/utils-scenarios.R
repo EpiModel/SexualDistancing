@@ -516,3 +516,12 @@ dts <- purrr::map(dts, as.numeric)
 sens_scenarios <- purrr::pmap(dts, ~ mk_sens_scenar(..1, ..2))
 
 names(sens_scenarios) <- purrr::pmap_chr(dts, ~ paste0("sensi_net", ..1, "_ser", ..2))
+
+scenarios_3_18 <- sens_scenarios[names(sens_scenarios) %in% c("sensi_net0_ser0",
+                                                              "sensi_net3_ser0",
+                                                              "sensi_net0_ser18",
+                                                              "sensi_net3_ser18"
+                                                              )]
+
+
+names(scenarios_3_18) <- c("base_318", "net_only_318", "ser_only_318", "comb_318")

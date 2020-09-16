@@ -49,3 +49,10 @@ sensi_scenario_names <- purrr::pmap_chr(dts, ~ glue::glue(
 names(sensi_scenario_names) <- purrr::pmap_chr(dts, ~ glue::glue(
   "sensi_net{..1}_ser_{..2}"
 ))
+
+scenarios_3_18_names <- c(
+  "base_318" = "Base Scenario",
+  "net_only_318" = "Changes in Total Partnership Network - Reduction by 50% (3 Months)",
+  "ser_only_318" = "Combined Serviced Reduction - Reduction by 50% (18 Months)",
+  "comb_318"  = "Reduce Casl/OO Net Behavior by 50% (3 Months), Combined Service Reduction of 50% (18 Months)"
+)

@@ -5,7 +5,7 @@ fn <- list.files("analysis/data", pattern = "df_sim", full.names = TRUE, recursi
 # df1 <- readRDS(fn[1])
 
 # To process only a subset:
-## fn <- fn[grepl("net_casl_1", fn)]
+## fn <- fn[grepl("comb_\\d+_025", fn)]
 
 btch <- 0
 for (i in seq_along(fn)) {
