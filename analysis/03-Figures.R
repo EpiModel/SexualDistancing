@@ -4,7 +4,7 @@
 
 # Setup -------------------------------------------------------------------
 
-rm(list=ls())
+rm(list = ls())
 
 library("dplyr")
 library("ggplot2")
@@ -126,10 +126,16 @@ dev.off()
 
 
 ## 50-50 Scenario
-jpeg("analysis/Fig1-50.jpeg", height = 6, width = 12, units = "in", res = 300)
 
-par(mar = c(3,3,1,1), mgp = c(2,1,0))
-par(mfrow = c(1,2))
+df <- readRDS("~/data/SexDist/df.rds")
+df <- filter(df, time >= ana_beg)
+table(df$scenario)
+
+# jpeg("analysis/Fig1-50.jpeg", height = 6, width = 12, units = "in", res = 300)
+pdf("analysis/Fig1.pdf", height = 12, width = 12)
+
+par(mar = c(3,3,2,1), mgp = c(2,1,0))
+par(mfrow = c(2,2))
 
 ## HIV panel
 var <- "hiv_inc"
@@ -140,9 +146,12 @@ h1 <- create_var_df(df, scen, var)
 h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
 h3 <- apply_roll(h2, roll)
 plot(h3[, 1], type = "l", ylim = c(0, 5), col = 2, lwd = 2, lty = 1,
-     xlab = "Week", ylab = "HIV IR per 100 PYAR")
+     xlab = "Week", ylab = "HIV IR per 100 PYAR",
+     main = "A. HIV, 18m Distancing")
 draw_quants(h3, col = adjustcolor(2, alpha.f = 0.1))
-abline(v = c(int_beg-ana_beg, int_end-ana_beg), lty = 2)
+abline(v = int_beg-ana_beg, lty = 3)
+abline(v = int_end-ana_beg, lty = 3, col = 1)
+# abline(v = int_end-ana_beg, lty = 3, col = 1)
 
 h1 <- create_var_df(df, scen = "base", var)
 h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
@@ -162,11 +171,11 @@ scen <- "comb_05_05"
 h1 <- create_var_df(df, scen = scen, var)
 h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
 h3 <- apply_roll(h2, roll)
-lines(h3[, 1], type = "l", col = 4, lwd = 2, lty = 1)
+lines(h3[, 1], type = "l", col = 4, lwd = 2, lty = 2)
 draw_quants(h3, col = adjustcolor(4, alpha.f = 0.1))
 
 text(26, 4.9, "COVID Start", cex = 0.8)
-text(105, 4.9, "COVID End", cex = 0.8)
+text(100, 4.9, "Net & Services\nResume", cex = 0.8)
 
 ## STI panel
 
@@ -178,9 +187,11 @@ h1 <- create_var_df(df, scen, var)
 h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
 h3 <- apply_roll(h2, roll)
 plot(h3[, 1], type = "l", ylim = c(0, 100), col = 2, lwd = 2,
-     xlab = "Week", ylab = "STI IR per 100 PYAR")
+     xlab = "Week", ylab = "STI IR per 100 PYAR",
+     main = "B. STI, 18m Distancing")
 draw_quants(h3, col = adjustcolor(2, alpha.f = 0.1))
-abline(v = c(int_beg-ana_beg, int_end-ana_beg), lty = 2)
+abline(v = int_beg-ana_beg, lty = 3)
+abline(v = int_end-ana_beg, lty = 3, col = 1)
 
 h1 <- create_var_df(df, scen = "base", var)
 h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
@@ -200,6 +211,108 @@ scen <- "comb_05_05"
 h1 <- create_var_df(df, scen = scen, var)
 h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
 h3 <- apply_roll(h2, roll)
+lines(h3[, 1], type = "l", col = 4, lwd = 2, lty = 2)
+draw_quants(h3, col = adjustcolor(4, alpha.f = 0.1))
+
+legend("topright",
+       legend = c("No Change", "Sexual Distancing Only",
+                  "Service Reduction Only", "Combined"),
+       lwd = 2.5, lty = 1, col = c(1, 3, 2, 4), bty = "n", cex = 0.8)
+
+# text(26, 98, "COVID Start", cex = 0.8)
+# text(100, 98, "Net & Services\nResume", cex = 0.8)
+
+# dev.off()
+
+
+## 50-50 Scenario + 3 month distancing
+
+df <- readRDS("~/data/SexDist/df_318.rds")
+df <- filter(df, time >= ana_beg)
+table(df$scenario)
+
+# jpeg("analysis/Fig1-50-3dist.jpeg", height = 6, width = 12, units = "in", res = 300)
+
+# par(mar = c(3,3,1,1), mgp = c(2,1,0))
+# par(mfrow = c(1,2))
+
+## HIV panel
+var <- "hiv_inc"
+roll <- 8
+
+scen <- "ser_only_318"
+h1 <- create_var_df(df, scen, var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+plot(h3[, 1], type = "l", ylim = c(0, 5), col = 2, lwd = 2, lty = 1,
+     xlab = "Week", ylab = "HIV IR per 100 PYAR",
+     main = "C. HIV, 3m Distancing")
+draw_quants(h3, col = adjustcolor(2, alpha.f = 0.1))
+abline(v = int_beg-ana_beg, lty = 3)
+abline(v = int_end-ana_beg, lty = 3, col = 2)
+abline(v = int_beg-ana_beg+(3*4), lty = 3, col = 3)
+
+h1 <- create_var_df(df, scen = "base_318", var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+lines(h3[, 1], type = "l", col = 1, lwd = 2)
+draw_quants(h3, col = adjustcolor(1, alpha.f = 0.1))
+# abline(v = c(int_beg-ana_beg, int_end-ana_beg), lty = 2)
+
+scen <- "net_only_318"
+h1 <- create_var_df(df, scen = scen, var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+lines(h3[, 1], type = "l", col = 3, lwd = 2, lty = 2)
+draw_quants(h3, col = adjustcolor(3, alpha.f = 0.1))
+
+scen <- "comb_318"
+h1 <- create_var_df(df, scen = scen, var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+lines(h3[, 1], type = "l", col = 4, lwd = 2, lty = 1)
+draw_quants(h3, col = adjustcolor(4, alpha.f = 0.1))
+
+text(26, 4.9, "COVID Start", cex = 0.8)
+text(90, 4.9, "Net Resume", col = 3, cex = 0.8)
+text(150, 4.9, "Services\nResume", col = 2, cex = 0.8)
+
+
+## STI panel
+
+var <- "sti_inc"
+roll <- 4
+
+scen <- "ser_only_318"
+h1 <- create_var_df(df, scen, var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+plot(h3[, 1], type = "l", ylim = c(0, 100), col = 2, lwd = 2,
+     xlab = "Week", ylab = "STI IR per 100 PYAR",
+     main = "D. STI, 3m Distancing")
+draw_quants(h3, col = adjustcolor(2, alpha.f = 0.1))
+abline(v = int_beg-ana_beg, lty = 3)
+abline(v = int_end-ana_beg, lty = 3, col = 2)
+abline(v = int_beg-ana_beg+(3*4), lty = 3, col = 3)
+
+h1 <- create_var_df(df, scen = "base_318", var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+lines(h3[, 1], type = "l", col = 1, lwd = 2)
+draw_quants(h3, col = adjustcolor(1, alpha.f = 0.1))
+# abline(v = c(int_beg-ana_beg, int_end-ana_beg), lty = 2)
+
+scen <- "net_only_318"
+h1 <- create_var_df(df, scen = scen, var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+lines(h3[, 1], type = "l", col = 3, lwd = 2, lty = 2)
+draw_quants(h3, col = adjustcolor(3, alpha.f = 0.1))
+
+scen <- "comb_318"
+h1 <- create_var_df(df, scen = scen, var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
 lines(h3[, 1], type = "l", col = 4, lwd = 2, lty = 1)
 draw_quants(h3, col = adjustcolor(4, alpha.f = 0.1))
 
@@ -208,11 +321,7 @@ legend("topright",
                   "Service Reduction Only", "Combined"),
        lwd = 2.5, lty = 1, col = c(1, 3, 2, 4), bty = "n", cex = 0.8)
 
-text(26, 96, "COVID Start", cex = 0.8)
-text(105, 96, "COVID End", cex = 0.8)
-
 dev.off()
-
 
 
 
