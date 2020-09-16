@@ -1,12 +1,13 @@
 
 ## Exploratory and Data Processing
 
-fn <- list.files("analysis/data", pattern = "df_sim", full.names = TRUE, recursive = TRUE)
+fn <- list.files("analysis/data/main/", pattern = "df_sim", full.names = TRUE, recursive = TRUE)
 # df1 <- readRDS(fn[1])
 
 # To process only a subset:
-## fn <- fn[grepl("comb_\\d+_025", fn)]
+## fn <- fn[grepl("318", fn)]
 
+ldf <- vector("list", length(fn))
 btch <- 0
 for (i in seq_along(fn)) {
   btch <- btch + 1
@@ -32,16 +33,13 @@ for (i in seq_along(fn)) {
                      prep_cov, hiv_diag, hiv_suppr, sti_tx, sti_inc, sti_gc_inc,
                      sti_ct_inc, hiv_inc, deg_main, deg_casl, deg_inst,
                      sti.n.tot, sti.n.tx)
-  if (i == 1) {
-    df <- dft2
-  } else {
-    df <- rbind(df, dft2)
-  }
+  ldf[[i]] <- dft2
   cat(i, "/", length(fn), "...\n ", sep = "")
 }
+df <- dplyr::bind_rows(ldf)
 dim(df)
 
-saveRDS(df, file = "analysis/data/df.rds")
+saveRDS(df, file = "analysis/data/df_slow.rds")
 
 
 df <- readRDS("analysis/data/df.rds")
@@ -150,3 +148,13 @@ df_contour <- df_scenar %>%
 
 ggplot(df_contour, aes(x = ser, y = net, z = hiv_inc__med)) +
   geom_contour_fill(na.fill = TRUE)
+
+
+df <- df %>%
+  filter(!scenario %in% unique(df2$scenario))
+
+
+for (col in names(df)) {
+  if (!setequal(df[[col]], df_slow[[col]]))
+    print(col)
+}
