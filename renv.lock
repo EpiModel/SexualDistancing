@@ -800,6 +800,13 @@
       "Repository": "CRAN",
       "Hash": "bd93354f4a2ee4e096e3d7ad33e08b72"
     },
+    "patchwork": {
+      "Package": "patchwork",
+      "Version": "1.0.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "d6b817898a400e82e6777d4f7e027100"
+    },
     "pillar": {
       "Package": "pillar",
       "Version": "1.4.6",
