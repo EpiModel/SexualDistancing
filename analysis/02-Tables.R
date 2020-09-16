@@ -32,6 +32,7 @@ table(df$scenario)
 scen <- "base"
 scen <- "ser_prep_09"
 var <- "hiv_inc"
+var <- "sti.n.tx"
 roll <- 4
 
 calc_quants_ir(df, scen = scen, var = var,
@@ -56,7 +57,7 @@ calc_quants_ia(df, base.scen = "base", comp.scen = scen, var = var,
 
 scenario_set <- c("base",
                   "net_all_025", "net_all_05", "net_all_09",
-                  "net_casl_025", "net_casl_05", "net_casl_09", "net_casl_1",
+                  "net_casl_005", "net_casl_01", "net_casl_025", "net_casl_05", "net_casl_09", "net_casl_1",
                   "net_ot_025", "net_ot_05", "net_ot_09", "net_ot_1")
 epi_vars <- c("hiv_inc", "sti_inc", "sti_gc_inc", "sti_ct_inc")
 proc_vars <- c("deg_main", "deg_casl", "deg_inst")
@@ -69,7 +70,7 @@ for (ii in 1:length(scenario_set)) {
   rr <- list()
   for (jj in 1:length(epi_vars)) {
     temp <- calc_quants_ir(df, scen = scenario_set[[ii]], var = epi_vars[[jj]],
-                           t.start = int_end-4, t.end = int_end,
+                           t.start = int_end-5, t.end = int_end-1,
                            qnt.low = qlow, qnt.high = qhigh, round = 2)
     rr <- c(rr, temp)
     temp <- calc_quants_ci(df, scenario_set[[ii]], var = epi_vars[[jj]],
@@ -80,7 +81,7 @@ for (ii in 1:length(scenario_set)) {
   for (kk in 1:length(proc_vars)) {
     temp <- calc_quants_prev(df, scen = scenario_set[[ii]],
                             var = proc_vars[[kk]],
-                            at = int_end,
+                            at = int_end-1,
                             mult = 1, round = 2,
                             qnt.low = qlow, qnt.high = qhigh)
     rr <- c(rr, temp)
@@ -112,7 +113,7 @@ for (ii in 1:length(scenario_set)) {
   rr <- list()
   for (jj in 1:length(epi_vars)) {
     temp <- calc_quants_ir(df, scen = scenario_set[[ii]], var = epi_vars[[jj]],
-                           t.start = int_end-4, t.end = int_end,
+                           t.start = int_end-5, t.end = int_end-1,
                            qnt.low = qlow, qnt.high = qhigh, round = 2)
     rr <- c(rr, temp)
     temp <- calc_quants_ci(df, scenario_set[[ii]], var = epi_vars[[jj]],
@@ -123,7 +124,7 @@ for (ii in 1:length(scenario_set)) {
   for (kk in 1:length(proc_vars)) {
     temp <- calc_quants_prev(df, scen = scenario_set[[ii]],
                              var = proc_vars[[kk]],
-                             at = int_end,
+                             at = int_end-1,
                              mult = 1, round = 2,
                              qnt.low = qlow, qnt.high = qhigh)
     rr <- c(rr, temp)
@@ -132,6 +133,7 @@ for (ii in 1:length(scenario_set)) {
   t2[[ii]] <- rr
 }
 t2 <- as.data.frame(cbind(scenario_set, do.call("rbind", t2)))
+t2
 
 readr::write_csv(t2, "analysis/T2.csv")
 
@@ -154,7 +156,7 @@ for (ii in 1:length(scenario_set)) {
   rr <- list()
   for (jj in 1:length(epi_vars)) {
     temp <- calc_quants_ir(df, scen = scenario_set[[ii]], var = epi_vars[[jj]],
-                           t.start = int_end-4, t.end = int_end,
+                           t.start = int_end-5, t.end = int_end-1,
                            qnt.low = qlow, qnt.high = qhigh, round = 2)
     rr <- c(rr, temp)
     temp <- calc_quants_ci(df, scenario_set[[ii]], var = epi_vars[[jj]],
@@ -165,7 +167,7 @@ for (ii in 1:length(scenario_set)) {
   for (kk in 1:length(proc_vars)) {
     temp <- calc_quants_prev(df, scen = scenario_set[[ii]],
                              var = proc_vars[[kk]],
-                             at = int_end,
+                             at = int_end-1,
                              mult = 1, round = 2,
                              qnt.low = qlow, qnt.high = qhigh)
     rr <- c(rr, temp)
