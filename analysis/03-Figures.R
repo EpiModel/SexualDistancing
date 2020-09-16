@@ -29,13 +29,15 @@ table(df$scenario)
 
 # Figure 1 ----------------------------------------------------------------
 
-jpeg("analysis/Fig1A.jpeg", height = 5, width = 10, units = "in", res = 300)
+##  90-90 scenario
+jpeg("analysis/Fig1-90.jpeg", height = 6, width = 12, units = "in", res = 300)
 
 par(mar = c(3,3,1,1), mgp = c(2,1,0))
+par(mfrow = c(1,2))
 
 ## HIV panel
 var <- "hiv_inc"
-roll <- 4
+roll <- 8
 
 scen <- "ser_all_09"
 h1 <- create_var_df(df, scen, var)
@@ -67,21 +69,15 @@ h3 <- apply_roll(h2, roll)
 lines(h3[, 1], type = "l", col = 4, lwd = 2, lty = 1)
 draw_quants(h3, col = adjustcolor(4, alpha.f = 0.1))
 
-legend("topright",
-       legend = c("No Change", "Sexual Distancing Only",
-                  "Service Reduction Only", "Combined"),
-       lwd = 2.5, lty = 1, col = c(1, 3, 2, 4), bty = "n", cex = 0.8)
+# legend("topright",
+#        legend = c("No Change", "Sexual Distancing Only",
+#                   "Service Reduction Only", "Combined"),
+#        lwd = 2.5, lty = 1, col = c(1, 3, 2, 4), bty = "n", cex = 0.8)
 
-text(36, 4.9, "COVID Start", cex = 0.8)
-text(115, 4.9, "COVID End", cex = 0.8)
-
-dev.off()
+text(26, 4.9, "COVID Start", cex = 0.8)
+text(105, 4.9, "COVID End", cex = 0.8)
 
 ## STI panel
-
-jpeg("analysis/Fig1B.jpeg", height = 5, width = 10, units = "in", res = 300)
-
-par(mar = c(3,3,1,1), mgp = c(2,1,0))
 
 var <- "sti_inc"
 roll <- 4
@@ -121,10 +117,110 @@ legend("topright",
                   "Service Reduction Only", "Combined"),
        lwd = 2.5, lty = 1, col = c(1, 3, 2, 4), bty = "n", cex = 0.8)
 
-text(36, 96, "COVID Start", cex = 0.8)
-text(115, 96, "COVID End", cex = 0.8)
+text(26, 96, "COVID Start", cex = 0.8)
+text(105, 96, "COVID End", cex = 0.8)
 
 dev.off()
+
+
+
+## 50-50 Scenario
+jpeg("analysis/Fig1-50.jpeg", height = 6, width = 12, units = "in", res = 300)
+
+par(mar = c(3,3,1,1), mgp = c(2,1,0))
+par(mfrow = c(1,2))
+
+## HIV panel
+var <- "hiv_inc"
+roll <- 8
+
+scen <- "ser_all_05"
+h1 <- create_var_df(df, scen, var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+plot(h3[, 1], type = "l", ylim = c(0, 5), col = 2, lwd = 2, lty = 1,
+     xlab = "Week", ylab = "HIV IR per 100 PYAR")
+draw_quants(h3, col = adjustcolor(2, alpha.f = 0.1))
+abline(v = c(int_beg-ana_beg, int_end-ana_beg), lty = 2)
+
+h1 <- create_var_df(df, scen = "base", var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+lines(h3[, 1], type = "l", col = 1, lwd = 2)
+draw_quants(h3, col = adjustcolor(1, alpha.f = 0.1))
+# abline(v = c(int_beg-ana_beg, int_end-ana_beg), lty = 2)
+
+scen <- "net_all_05"
+h1 <- create_var_df(df, scen = scen, var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+lines(h3[, 1], type = "l", col = 3, lwd = 2, lty = 1)
+draw_quants(h3, col = adjustcolor(3, alpha.f = 0.1))
+
+scen <- "comb_05_05"
+h1 <- create_var_df(df, scen = scen, var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+lines(h3[, 1], type = "l", col = 4, lwd = 2, lty = 1)
+draw_quants(h3, col = adjustcolor(4, alpha.f = 0.1))
+
+text(26, 4.9, "COVID Start", cex = 0.8)
+text(105, 4.9, "COVID End", cex = 0.8)
+
+## STI panel
+
+var <- "sti_inc"
+roll <- 4
+
+scen <- "ser_all_05"
+h1 <- create_var_df(df, scen, var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+plot(h3[, 1], type = "l", ylim = c(0, 100), col = 2, lwd = 2,
+     xlab = "Week", ylab = "STI IR per 100 PYAR")
+draw_quants(h3, col = adjustcolor(2, alpha.f = 0.1))
+abline(v = c(int_beg-ana_beg, int_end-ana_beg), lty = 2)
+
+h1 <- create_var_df(df, scen = "base", var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+lines(h3[, 1], type = "l", col = 1, lwd = 2)
+draw_quants(h3, col = adjustcolor(1, alpha.f = 0.1))
+# abline(v = c(int_beg-ana_beg, int_end-ana_beg), lty = 2)
+
+scen <- "net_all_05"
+h1 <- create_var_df(df, scen = scen, var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+lines(h3[, 1], type = "l", col = 3, lwd = 2)
+draw_quants(h3, col = adjustcolor(3, alpha.f = 0.1))
+
+scen <- "comb_05_05"
+h1 <- create_var_df(df, scen = scen, var)
+h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
+h3 <- apply_roll(h2, roll)
+lines(h3[, 1], type = "l", col = 4, lwd = 2, lty = 1)
+draw_quants(h3, col = adjustcolor(4, alpha.f = 0.1))
+
+legend("topright",
+       legend = c("No Change", "Sexual Distancing Only",
+                  "Service Reduction Only", "Combined"),
+       lwd = 2.5, lty = 1, col = c(1, 3, 2, 4), bty = "n", cex = 0.8)
+
+text(26, 96, "COVID Start", cex = 0.8)
+text(105, 96, "COVID End", cex = 0.8)
+
+dev.off()
+
+
+
+
+# Figure 2 ----------------------------------------------------------------
+
+dfs <- readRDS("~/data/SexDist/df_sensi.rds")
+dfs <- filter(dfs, time >= ana_beg)
+table(dfs$scenario)
+
 
 
 
@@ -133,8 +229,6 @@ fig1 <- ci_contour_df(6000:6721)
 table(fig1$p1, fig1$p2, fig1$lnt)
 
 save(fig1, file = "data/Fig1-data.rda")
-
-system("scp mox:/gscratch/csde/sjenness/combprev/data/Fig1-data.rda analysis/")
 
 # Graphics Locally
 rm(list = ls())
@@ -202,50 +296,4 @@ f1
 ggsave("analysis/fig/Figure1.pdf", device = "pdf", height = 6, width = 10, units = "in")
 ggsave("analysis/fig/Figure1.jpg", device = "jpg", height = 6, width = 10, units = "in")
 
-
-# Figure 2 ----------------------------------------------------------------
-
-load("analysis/data/sim.n8000.rda")
-sim.base <- truncate_sim(sim, 2)
-
-load("analysis/data/sim.n8001.rda")
-sim.comp <- truncate_sim(sim, 2)
-
-df.base <- as.data.frame(sim.base, out = "mean")
-df.comp <- as.data.frame(sim.comp, out = "mean")
-
-save(df.base, df.comp, file = "analysis/Fig2-data.rda")
-
-load("analysis/Fig2-data.rda")
-
-ir.base <- df.base$ir100
-ir.comp <- df.comp$ir100
-
-y <- supsmu(1:nrow(df.comp), df.comp$ir100)$y
-plot(y, type = "l")
-abline(h = c(1.18*0.1, 1.18*0.25), v = 622, lty = 2)
-
-which.max(y <= 1.18*0.1)
-622/52
-2020 + 622/52
-
-which.max(y <= 1.18*0.25)
-208/52
-2020 + 208/52
-
-pal <- adjustcolor(RColorBrewer::brewer.pal(3, "Set1"), alpha.f = 0.8)
-xs <- 2020 + 1:length(ir.base)/52
-
-# pdf(file = "analysis/fig/Figure2.pdf", height = 6, width = 10)
-jpeg(file = "analysis/fig/Figure2.jpg", height = 6, width = 10, res = 200, units = "in")
-par(mar = c(3,3,1,1), mgp = c(2,1,0))
-plot(xs, ir.base, type = "l", ylim = c(0, 1.5), col = pal[2], lwd = 1.2,
-     ylab = "Incidence Rate per 100 PYAR", xlab = "Year", font.lab = 2)
-lines(xs, ir.comp, col = pal[1], lwd = 1.2)
-abline(h = c(1.18*0.1, 1.18*0.25), lty = 2, lwd = 1, col = adjustcolor("black", alpha.f = 0.6))
-text(2062, 0.16, "EHE 2030 90% Reduction Target", cex = 0.9)
-text(2062, 0.35, "EHE 2025 75% Reduction Target", cex = 0.9)
-legend("topright", legend = c("Reference Model", "10x10 Model"), lty = 1, lwd = 2, col = pal[2:1],
-       bty = "n", cex = 0.9)
-dev.off()
 
