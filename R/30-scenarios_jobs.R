@@ -74,7 +74,6 @@ param$param_updaters <- list(
 source("R/utils-scenarios.R")
 
 scenarios <- sens_scenarios
-param$param_updaters <- NULL
 ## scenarios <- scenarios[grepl("comb_025", names(scenarios))]
 ## scenarios <- scenarios["net_casl_1"]
 

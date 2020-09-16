@@ -36,3 +36,16 @@ scenario_names <- c(
   "ser_stitx_05" = "Reduction in STI Treatment Proportion - Reduction by 50%",
   "ser_stitx_09" = "Reduction in STI Treatment Proportion - Reduction by 90%"
 )
+
+dts <- purrr::cross(list(seq(0, 18, 3), seq(0, 18, 3)))
+dts <- purrr::transpose(dts)
+dts <- purrr::map(dts, as.numeric)
+
+sensi_scenario_names <- purrr::pmap_chr(dts, ~ glue::glue(
+  "Sensitivity Analysis, {..1} Months Sexual Distancing,",
+  " {..2} Months Service reduction"
+))
+
+names(sensi_scenario_names) <- purrr::pmap_chr(dts, ~ glue::glue(
+  "sensi_net{..1}_ser_{..2}"
+))
