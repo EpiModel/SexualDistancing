@@ -1,7 +1,6 @@
 
 source("analysis/00-fx.R")
 
-
 # Date targets
 prep_start <- 52 * (65 + 1) + 1
 ana_beg <- prep_start + 5 * 52
@@ -18,12 +17,12 @@ dim(df)
 table(df$scenario)
 
 # limit net_casl_05 to 560 sims
-length(unique(df$batch[df$scenario == "base"]))
-length(unique(df$batch[df$scenario == "net_casl_05"]))
-netCasl05.batches <- unique(df$batch[df$scenario == "net_casl_05"])
-df1 <- filter(df, scenario == "net_casl_05" & batch %in% netCasl05.batches[1:20])
-df2 <- filter(df, scenario != "net_casl_05")
-df <- rbind(df2, df1)
+# length(unique(df$batch[df$scenario == "base"]))
+# length(unique(df$batch[df$scenario == "net_casl_05"]))
+# netCasl05.batches <- unique(df$batch[df$scenario == "net_casl_05"])
+# df1 <- filter(df, scenario == "net_casl_05" & batch %in% netCasl05.batches[1:20])
+# df2 <- filter(df, scenario != "net_casl_05")
+# df <- rbind(df2, df1)
 
 table(df$scenario)
 
@@ -141,10 +140,10 @@ readr::write_csv(t2, "analysis/T2.csv")
 ## Table 3
 
 scenario_set <- c("base",
-                  "comb_025_05", "comb_025_09",
-                  "comb_05_05", "comb_05_09",
-                  "comb_075_05", "comb_075_09",
-                  "comb_09_05", "comb_09_09")
+                  "comb_025_025", "comb_025_05", "comb_025_09",
+                  "comb_05_025", "comb_05_05", "comb_05_09",
+                  "comb_075_025", "comb_075_05", "comb_075_09",
+                  "comb_09_025", "comb_09_05", "comb_09_09")
 epi_vars <- c("hiv_inc", "sti_inc", "sti_gc_inc", "sti_ct_inc")
 proc_vars <- c("prep_cov", "hiv_diag", "hiv_suppr", "sti_tx")
 
@@ -179,3 +178,38 @@ t3 <- as.data.frame(cbind(scenario_set, do.call("rbind", t3)))
 t3
 
 readr::write_csv(t3, "analysis/T3.csv")
+
+
+## Supplemental Tables (318 Scenario)
+
+df <- readRDS("~/data/SexDist/df_318.rds")
+df <- filter(df, time >= ana_beg)
+table(df$scenario)
+
+scenario_set <- c("base_318", "net_only_318", "ser_only_318", "comb_318")
+epi_vars <- c("hiv_inc", "sti_inc", "sti_gc_inc", "sti_ct_inc")
+proc_vars <- NULL
+
+qlow <- 0.025
+qhigh <- 0.975
+
+st <- list()
+for (ii in 1:length(scenario_set)) {
+  rr <- list()
+  for (jj in 1:length(epi_vars)) {
+    temp <- calc_quants_ir(df, scen = scenario_set[[ii]], var = epi_vars[[jj]],
+                           t.start = int_end-5, t.end = int_end-1,
+                           qnt.low = qlow, qnt.high = qhigh, round = 2)
+    rr <- c(rr, temp)
+    temp <- calc_quants_ci(df, scenario_set[[ii]], var = epi_vars[[jj]],
+                           t.start = ana_beg, t.end = ana_end,
+                           qnt.low = qlow, qnt.high = qhigh, round = 1)
+    rr <- c(rr, temp)
+  }
+  rr <- do.call("c", rr)
+  st[[ii]] <- rr
+}
+st <- as.data.frame(cbind(scenario_set, do.call("rbind", st)))
+st
+
+readr::write_csv(t3, "analysis/ST-318.csv")
