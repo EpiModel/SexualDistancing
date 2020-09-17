@@ -139,17 +139,80 @@ saveRDS(df_scenar50, fs::path("out/df_scenar50.rds"))
 df_table <- left_join(df_scenar25, df_scenar50, by = "scenario")
 
 
+library(tidyverse)
+library(viridis)
 library(metR)
-df_scenar <- readRDS("out/df_scenar.rds")
 
-df_contour <- df_scenar %>%
-  filter(
-    time == int_end,
-    scenario %in% c("base", scenario[grep("comb_", scenario)])) %>%
-  select(scenario, sti_inc__med, hiv_inc__med) %>%
-  mutate(scenario = if_else(scenario == "base", "base_00_00", scenario)) %>%
-  separate(scenario, into = c(NA, "ser", "net"), "_") %>%
-  mutate(across(c(ser, net), ~ as.numeric(str_pad(.x, 3, "right", "0"))))
+prep_start <- 52 * (65 + 1) + 1
+ana_beg <- prep_start + 5 * 52
+int_beg <- ana_beg + 1 * 52
+int_end <- int_beg + 1.5 * 52
+ana_end <- int_end + 2.5 * 52
 
-ggplot(df_contour, aes(x = ser, y = net, z = hiv_inc__med)) +
-  geom_contour_fill(na.fill = TRUE)
+df_sensi <- readRDS("analysis/data/df_sensi.rds")
+
+dfs <- df_sensi %>%
+  filter(time >= ana_beg) %>%
+  group_by(sim, batch, scenario) %>%
+  summarise(
+    hivCI = sum(hiv_inc),
+    stiCI = sum(sti_inc)
+  ) %>%
+  group_by(scenario) %>%
+  summarise(across(c(hivCI, stiCI), median)) %>%
+  separate(scenario, into = c(NA, "net", "ser"), "\\D+", remove = FALSE) %>%
+  mutate(across(c(net, ser), .fns = as.numeric)) #%>% pivot_longer(c(hivCI, stiCI))
+
+
+ggplot(dfs, aes(x = ser, y = net, z = stiCI)) +
+  geom_contour_fill(na.fill = TRUE) +
+  geom_contour(col = "white", alpha = 0.5, lwd = 0.5) +
+  ## geom_text_contour(stroke = 0.1, size = 3.5) +
+  scale_fill_viridis(discrete = FALSE, alpha = 1, option = "D", direction = 1) +
+  scale_y_continuous(expand = c(0, 0)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  xlab("Service Interruption Duration (Months)") +
+  ylab("Sexual Distancing Duration (Months)") +
+  guides(fill = guide_legend(
+    title = "Sexual Distancing Duration (Months):",
+    nrow = 1
+  ))
+
+gg_sensi_contour <- function(df_sensi, outcome, outcome_label) {
+  prep_start <- 52 * (65 + 1) + 1
+  ana_beg <- prep_start + 5 * 52
+
+  dfs <- df_sensi %>%
+    filter(time >= ana_beg) %>%
+    group_by(sim, batch, scenario) %>%
+    summarise(
+      hivCI = sum(hiv_inc),
+      stiCI = sum(sti_inc)
+    ) %>%
+    group_by(scenario) %>%
+    summarise(across(c(hivCI, stiCI), median)) %>%
+    separate(scenario, into = c(NA, "net", "ser"), "\\D+", remove = FALSE) %>%
+    mutate(across(c(net, ser), .fns = as.numeric))
+
+  p <- ggplot(dfs, aes(x = ser, y = net, z = {{ outcome }})) +
+    geom_contour_fill(na.fill = TRUE) +
+    geom_contour(col = "white", alpha = 0.5, lwd = 0.5) +
+    scale_fill_viridis(
+      discrete = FALSE,
+      alpha = 1,
+      option = "D",
+      direction = 1,
+      name = outcome_label
+    ) +
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_x_continuous(expand = c(0, 0)) +
+    xlab("Service Interruption Duration (Months)") +
+    ylab("Sexual Distancing Duration (Months)") +
+    theme_classic() +
+    theme(legend.position = "top")
+
+  p
+}
+
+gg_sensi_contour(df_sensi, hivCI, "HIV Cumulative Incidence")
+gg_sensi_contour(df_sensi, stiCI, "STI CumulativeIncidence")

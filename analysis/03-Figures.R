@@ -386,7 +386,7 @@ p1/p2
 ggsave("analysis/Figure2.jpeg", device = "jpeg", height = 6, width = 12, units = "in")
 
 
-## P1 P2 with facets:
+## P1 P2 with facets: ----------------------------------------------------------
 dfs1 %>%
   select(net, ser, hivCI, stiCI) %>%
   pivot_longer(c(hivCI, stiCI)) %>%
@@ -420,76 +420,46 @@ dfs1 %>%
 
 ggsave("analysis/Figure2_facet.jpeg", device = "jpeg", height = 6, width = 12, units = "in")
 
+# Contour plots ----------------------------------------------------------------
 
-fig1 <- ci_contour_df(6000:6721)
-table(fig1$p1, fig1$p2, fig1$lnt)
+gg_sensi_contour <- function(df_sensi, outcome, outcome_label) {
+  prep_start <- 52 * (65 + 1) + 1
+  ana_beg <- prep_start + 5 * 52
 
-save(fig1, file = "data/Fig1-data.rda")
+  dfs <- df_sensi %>%
+    filter(time >= ana_beg) %>%
+    group_by(sim, batch, scenario) %>%
+    summarise(
+      hivCI = sum(hiv_inc),
+      stiCI = sum(sti_inc)
+    ) %>%
+    group_by(scenario) %>%
+    summarise(across(c(hivCI, stiCI), median)) %>%
+    separate(scenario, into = c(NA, "net", "ser"), "\\D+", remove = FALSE) %>%
+    mutate(across(c(net, ser), .fns = as.numeric))
 
-# Graphics Locally
-rm(list = ls())
-load("analysis/Fig1-data.rda")
+  p <- ggplot(dfs, aes(x = ser, y = net, z = {{ outcome }})) +
+    geom_contour_fill(na.fill = TRUE) +
+    geom_contour(col = "white", alpha = 0.5, lwd = 0.5) +
+    scale_fill_continuous(type = "viridis", direction = -1, name = "CI") +
+    scale_y_continuous(expand = c(0, 0)) +
+    scale_x_continuous(expand = c(0, 0)) +
+    xlab("Service Interruption Duration (Months)") +
+    ylab("Sexual Distancing Duration (Months)") +
+    theme_classic() +
+    theme(
+      plot.title = element_text(hjust = 0.5, face = "bold"),
+      aspect.ratio = 1
+    ) +
+    guides(fill = guide_colourbar(title.position = "top", title.hjust = 0.1)) +
+    ggtitle(outcome_label)
 
-f1a <- filter(fig1, lnt == TRUE)
-f1b <- filter(fig1, lnt == FALSE)
+  p
+}
 
-f1a.base <- filter(f1a, p1 == 1 & p2 == 1) %>%
-  summarise(mi = median(incid)) %>%
-  as.numeric
-f1a$pia <- (f1a.base - f1a$incid)/f1a.base
-f1a[sample(nrow(f1a), 25), ]
+df_sensi <- readRDS("~/data/SexDist/df_sensi.rds")
 
-f1b.base <- filter(f1b, p1 == 1 & p2 == 1) %>%
-  summarise(mi = median(incid)) %>%
-  as.numeric
-f1b$pia <- (f1b.base - f1b$incid)/f1b.base
-f1b[sample(nrow(f1b), 25), ]
-
-loess1a <- loess(pia ~ p1 * p2, data = f1a)
-fit1a <- expand.grid(list(p1 = seq(1, 10, 0.1),
-                          p2 = seq(1, 10, 0.1)))
-fit1a$pia <- as.numeric(predict(loess1a, newdata = fit1a))
-head(fit1a, 25)
-
-loess1b <- loess(pia ~ p1 * p2, data = f1b)
-fit1b <- expand.grid(list(p1 = seq(1, 10, 0.1),
-                          p2 = seq(1, 10, 0.1)))
-fit1b$pia <- as.numeric(predict(loess1b, newdata = fit1b))
-head(fit1b, 25)
-
-fit1a$LNT = "PrEP Linked"
-fit1b$LNT = "PrEP Unlinked"
-fit1 <- rbind(fit1a, fit1b)
-
-tail(arrange(filter(fit1, LNT == "PrEP Linked"), pia), 10)
-tail(arrange(filter(fit1, LNT == "PrEP Unlinked"), pia), 10)
-
-filter(fit1a, p1 == 10 & p2 == 10)
-filter(fit1b, p1 == 10 & p2 == 10)
-
-filter(f1a, p1 == 10 & p2 == 10) %>%
-  summarise(mi = mean(pia))
-
-filter(f1b, p1 == 10 & p2 == 10) %>%
-  summarise(mi = mean(pia))
-
-names(fit1)[3] <- "PIA"
-fit1$PIA <- fit1$PIA * 100
-head(fit1, 25)
-
-f1 <- ggplot(fit1, aes(p1, p2)) +
-  geom_raster(aes(fill = PIA), interpolate = TRUE) +
-  geom_contour(aes(z = PIA), col = "white", alpha = 0.5, lwd = 0.5) +
-  geom_text_contour(aes(z = PIA), stroke = 0.1, size = 3.5) +
-  theme_minimal() +
-  facet_grid(cols = vars(LNT)) +
-  scale_y_continuous(expand = c(0, 0)) +
-  scale_x_continuous(expand = c(0, 0)) +
-  labs(y = "Relative Retention", x = "Relative Screening") +
-  scale_fill_viridis(discrete = FALSE, alpha = 1, option = "D", direction = 1)
-f1
-
-ggsave("analysis/fig/Figure1.pdf", device = "pdf", height = 6, width = 10, units = "in")
-ggsave("analysis/fig/Figure1.jpg", device = "jpg", height = 6, width = 10, units = "in")
-
-
+gg_sensi_contour(df_sensi, hivCI, "A. HIV Cumulative Incidence")
+ggsave("analysis/Figure3_HIV.jpeg", device = "jpeg", height = 6, width = 6, units = "in")
+gg_sensi_contour(df_sensi, stiCI, "B. STI CumulativeIncidence")
+ggsave("analysis/Figure3_STI.jpeg", device = "jpeg", height = 6, width = 6, units = "in")
