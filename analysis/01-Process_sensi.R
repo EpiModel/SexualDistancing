@@ -1,6 +1,6 @@
 ## Exploratory and Data Processing
 
-fn <- list.files("analysis/data", pattern = "df_sim", full.names = TRUE, recursive = TRUE)
+fn <- list.files("analysis/data/sensi", pattern = "df_sim", full.names = TRUE, recursive = TRUE)
 # df1 <- readRDS(fn[1])
 fn <- fn[grepl("sensi_", fn)] # only sensitivity analysis
 
