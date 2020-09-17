@@ -408,6 +408,7 @@ dfs1 %>%
   xlab("Service Interruption Duration (Months)") +
   theme_light() +
   theme(
+    aspect.ratio = 1/4,
     strip.background = element_rect(fill = "black"),
     legend.margin = margin(0, 0, -5, 0),
     legend.position = "top"
