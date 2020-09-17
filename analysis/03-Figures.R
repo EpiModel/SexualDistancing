@@ -386,8 +386,39 @@ p1/p2
 ggsave("analysis/Figure2.jpeg", device = "jpeg", height = 6, width = 12, units = "in")
 
 
+## P1 P2 with facets:
+dfs1 %>%
+  select(net, ser, hivCI, stiCI) %>%
+  pivot_longer(c(hivCI, stiCI)) %>%
+  ggplot(aes(x = ser, y = value, fill = net)) +
+  geom_boxplot(
+    outlier.shape = NA,
+    alpha = 0.75,
+    width = 0.6,
+    position = position_dodge(0.8),
+  ) +
+  facet_grid(
+    rows = vars(name), scales = "free_y", switch = "y",
+    labeller = function(x) list("name" = c("HIV Cumulative Incidence",
+                                           "STI CumulativeIncidence"))
+  ) +
+  scale_fill_brewer(palette = "Set1") +
+  ## ylab("Cumulative Incidence") +
+  ylab("") +
+  xlab("Service Interruption Duration (Months)") +
+  theme_light() +
+  theme(
+    strip.background = element_rect(fill = "black"),
+    legend.margin = margin(0, 0, -5, 0),
+    legend.position = "top"
+  ) +
+  guides(fill = guide_legend(
+    title.position = "left",
+    title = "Sexual Distancing Duration (Months):",
+    nrow = 1
+  ))
 
-
+ggsave("analysis/Figure2_facet.jpeg", device = "jpeg", height = 6, width = 12, units = "in")
 
 
 fig1 <- ci_contour_df(6000:6721)
