@@ -68,7 +68,7 @@ calc_quants_ir <- function(x, scen, var, t.start, t.end,
   return(out)
 }
 
-calc_quants_ci <- function(x, scen, var, t.start, t.end,
+calc_quants_ci <- function(x, scen, var, t.start, t.end, mult = 1000,
                            qnt.low = 0.025, qnt.high = 0.975, round = 2) {
   if (is.null(x[[var]])) {
     stop("var ", var, " does not exist on x", call. = FALSE)
@@ -77,7 +77,7 @@ calc_quants_ci <- function(x, scen, var, t.start, t.end,
   row.start <- which(x$time == t.start)
   row.end <- which(x$time == t.end)
   x <- x[row.start:row.end, -1]
-  out <- as.numeric(colSums(x))
+  out <- as.numeric(colSums(x))*(mult/5200)
   out <- quantile(out, c(0.5, qnt.low, qnt.high), names = FALSE)
   format <- paste0("%.", round, "f")
   out <- sprintf(format, out)
@@ -87,12 +87,12 @@ calc_quants_ci <- function(x, scen, var, t.start, t.end,
 
 
 calc_quants_ia <- function(x, base.scen, comp.scen, var,
-                           t.start, t.end,
+                           t.start, t.end, mult = 1,
                            qnt.low = 0.025, qnt.high = 0.975,
                            nsims = 1000, round.nia = 1, round.pia = 1) {
 
   vec.nia <- rep(NA, nsims)
-  vec.pia <- rep(NA, nsims)
+  # vec.pia <- rep(NA, nsims)
 
   x.base <- create_var_df(x, base.scen, var)
   x.comp <- create_var_df(x, comp.scen, var)
@@ -105,30 +105,30 @@ calc_quants_ia <- function(x, base.scen, comp.scen, var,
   x.base <- x.base[row.start.base:row.end.base, -1]
   x.comp <- x.comp[row.start.comp:row.end.comp, -1]
 
-  incid.comp.start <- unname(colSums(x.comp))
-  incid.base.start <- unname(colSums(x.base))
+  incid.comp.start <- unname(colSums(x.comp))*(mult/5200)
+  incid.base.start <- unname(colSums(x.base))*(mult/5200)
 
   for (i in 1:nsims) {
     incid.comp <- sample(incid.comp.start)
     incid.base <- sample(incid.base.start)
-    vec.nia[i] <- median(incid.base - incid.comp)
-    vec.pia[i] <- median((incid.base - incid.comp) / incid.base)
+    vec.nia[i] <- median(incid.comp - incid.base)
+    # vec.pia[i] <- median((incid.base - incid.comp) / incid.base)
   }
   nia <- quantile(vec.nia, c(0.5, qnt.low, qnt.high), names = FALSE)
   format <- paste0("%.", round.nia, "f")
   nia <- sprintf(format, nia)
   nia <- paste0(nia[1], " (", nia[2], ", ", nia[3], ")")
 
-  pia <- quantile(vec.pia, c(0.5, qnt.low, qnt.high), names = FALSE)*100
-  format <- paste0("%.", round.pia, "f")
-  pia <- sprintf(format, pia)
-  pia <- paste0(pia[1], " (", pia[2], ", ", pia[3], ")")
+  # pia <- quantile(vec.pia, c(0.5, qnt.low, qnt.high), names = FALSE)*100
+  # format <- paste0("%.", round.pia, "f")
+  # pia <- sprintf(format, pia)
+  # pia <- paste0(pia[1], " (", pia[2], ", ", pia[3], ")")
 
-  out <- list()
-  out$nia <- nia
-  out$pia <- pia
+  # out <- list()
+  # out$nia <- nia
+  # out$pia <- pia
 
-  return(out)
+  return(nia)
 }
 
 
