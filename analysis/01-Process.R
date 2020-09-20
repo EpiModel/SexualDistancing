@@ -13,33 +13,40 @@ for (i in seq_along(fn)) {
   btch <- btch + 1
   dft <- readRDS(fn[i])
   # dft <- dplyr::select(dft, var.names)
-  prep_cov = dft$prepCurr / dft$prepElig
-  hiv_diag = dft$cc.dx
-  hiv_suppr = dft$cc.vsupp
-  sti_tx = (dft$gc.tx + dft$ct.tx) / (dft$gc + dft$ct)
-  sti_inc = dft$ir100.sti
-  sti_gc_inc = dft$ir100.gc
-  sti_ct_inc = dft$ir100.ct
-  hiv_inc = dft$ir100
-  deg_main = dft$main.deg
-  deg_casl = dft$casl.deg
-  deg_inst = dft$inst.deg
-  sti.n.tx = dft$gc.tx + dft$ct.tx
-  sti.n.tot = dft$gc + dft$ct
-  dft2 <- data.frame(sim = dft$sim,
-                     batch = btch,
-                     time = dft$time,
-                     scenario = dft$scenario,
-                     prep_cov, hiv_diag, hiv_suppr, sti_tx, sti_inc, sti_gc_inc,
-                     sti_ct_inc, hiv_inc, deg_main, deg_casl, deg_inst,
-                     sti.n.tot, sti.n.tx)
+  dft2 <- data.frame(
+    sim = dft$sim,
+    batch = btch,
+    time = dft$time,
+    scenario = dft$scenario,
+    prep_cov = dft$prepCurr / dft$prepElig,
+    hiv_diag = dft$cc.dx,
+    hiv_suppr = dft$cc.vsupp,
+    hiv_inc = dft$ir100,
+    hiv_inc_raw = dft$incid,
+    hiv_s_raw = dft$s.num,
+    sti_gc_inc = dft$ir100.gc,
+    sti_gc_inc_raw = dft$incid.gc,
+    sti_gc_s_raw = dft$num - dft$incid.gc,
+    sti_ct_inc = dft$ir100.ct,
+    sti_ct_inc_raw = dft$incid.ct,
+    sti_ct_s_raw = dft$num - dft$incid.ct,
+    sti_tx = (dft$gc.tx + dft$ct.tx) / (dft$gc + dft$ct),
+    sti_inc = dft$ir100.sti,
+    sti_inc_raw = dft$incid.gc + dft$incid.ct,
+    sti.n.tx = dft$gc.tx + dft$ct.tx,
+    sti.n.tot = dft$gc + dft$ct,
+    deg_main = dft$main.deg,
+    deg_casl = dft$casl.deg,
+    deg_inst = dft$inst.deg
+  )
+
   ldf[[i]] <- dft2
   cat(i, "/", length(fn), "...\n ", sep = "")
 }
 df <- dplyr::bind_rows(ldf)
 dim(df)
 
-saveRDS(df, file = "analysis/data/df_slow.rds")
+saveRDS(df, file = "analysis/data/df.rds")
 
 
 df <- readRDS("analysis/data/df.rds")
