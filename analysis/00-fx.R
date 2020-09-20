@@ -114,10 +114,16 @@ calc_quants_ia <- function(x, base.scen, comp.scen, var,
     vec.nia[i] <- median(incid.comp - incid.base)
     # vec.pia[i] <- median((incid.base - incid.comp) / incid.base)
   }
-  nia <- quantile(vec.nia, c(0.5, qnt.low, qnt.high), names = FALSE)
-  format <- paste0("%.", round.nia, "f")
-  nia <- sprintf(format, nia)
-  nia <- paste0(nia[1], " (", nia[2], ", ", nia[3], ")")
+  if (qnt.low == 0 & qnt.high == 0) {
+    nia <- quantile(vec.nia, c(0.5), names = FALSE)
+    format <- paste0("%.", round.nia, "f")
+    nia <- sprintf(format, nia)
+  } else {
+    nia <- quantile(vec.nia, c(0.5, qnt.low, qnt.high), names = FALSE)
+    format <- paste0("%.", round.nia, "f")
+    nia <- sprintf(format, nia)
+    nia <- paste0(nia[1], " (", nia[2], ", ", nia[3], ")")
+  }
 
   # pia <- quantile(vec.pia, c(0.5, qnt.low, qnt.high), names = FALSE)*100
   # format <- paste0("%.", round.pia, "f")
