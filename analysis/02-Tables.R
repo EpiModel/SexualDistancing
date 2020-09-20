@@ -15,23 +15,15 @@ df <- filter(df, time >= ana_beg)
 dim(df)
 
 table(df$scenario)
-
-# limit net_casl_05 to 560 sims
-# length(unique(df$batch[df$scenario == "base"]))
-# length(unique(df$batch[df$scenario == "net_casl_05"]))
-# netCasl05.batches <- unique(df$batch[df$scenario == "net_casl_05"])
-# df1 <- filter(df, scenario == "net_casl_05" & batch %in% netCasl05.batches[1:20])
-# df2 <- filter(df, scenario != "net_casl_05")
-# df <- rbind(df2, df1)
-
-table(df$scenario)
+names(df)
 
 ## Test outcomes
 
 scen <- "base"
-scen <- "ser_prep_09"
+scen <- "ser_all_05"
 var <- "hiv_inc"
-var <- "sti.n.tx"
+var <- "sti_inc"
+
 roll <- 4
 
 calc_quants_ir(df, scen = scen, var = var,
@@ -39,25 +31,38 @@ calc_quants_ir(df, scen = scen, var = var,
                qnt.low = 0.25, qnt.high = 0.75)
 
 calc_quants_ci(df, scen = scen, var = var,
-               t.start = ana_beg, t.end = ana_end,
+               t.start = ana_beg, t.end = ana_end, mult = ATL.msm.n,
                qnt.low = 0.25, qnt.high = 0.75, round = 1)
 
 calc_quants_prev(df, scen = scen, var = "prep_cov", at = int_end,
                  mult = 1, round = 2,
                  qnt.low = 0.025, qnt.high = 0.975)
 
-calc_quants_ia(df, base.scen = "base", comp.scen = scen, var = var,
-               t.start = ana_beg, t.end = ana_end,
-               qnt.low = 0.025, qnt.high = 0.975,
-               nsims = 1000, round.nia = 1, round.pia = 1)
 
+
+# Population parameters
+ATL.msm.n <- 102642     # Grey et al
+ATL.hiv.dx.n <- 12532   # Rosenberg et al
+ATL.prop.dx <- 0.84     # GA DPH
+ATL.hiv.tot.n <- ATL.hiv.dx.n/ATL.prop.dx
+ATL.hiv.neg.n <- ATL.msm.n - ATL.hiv.tot.n
+ATL.hiv.neg.n
+
+calc_quants_ia(df, base.scen = "base", comp.scen = scen, var = "hiv_inc",
+               t.start = ana_beg, t.end = ana_end, mult = ATL.hiv.neg.n,
+               qnt.low = 0.025, qnt.high = 0.975,
+               nsims = 1000, round.nia = 1)
+calc_quants_ia(df, base.scen = "base", comp.scen = scen, var = "sti_inc",
+               t.start = ana_beg, t.end = ana_end, mult = ATL.msm.n,
+               qnt.low = 0.025, qnt.high = 0.975,
+               nsims = 1000, round.nia = 1)
 
 ## Table 1
 
 scenario_set <- c("base",
                   "net_all_025", "net_all_05", "net_all_09",
-                  "net_casl_005", "net_casl_01", "net_casl_025", "net_casl_05", "net_casl_09", "net_casl_1",
-                  "net_ot_025", "net_ot_05", "net_ot_09", "net_ot_1")
+                  "net_casl_025", "net_casl_05", "net_casl_09",
+                  "net_ot_025", "net_ot_05", "net_ot_09")
 epi_vars <- c("hiv_inc", "sti_inc", "sti_gc_inc", "sti_ct_inc")
 proc_vars <- c("deg_main", "deg_casl", "deg_inst")
 
@@ -73,8 +78,26 @@ for (ii in 1:length(scenario_set)) {
                            qnt.low = qlow, qnt.high = qhigh, round = 2)
     rr <- c(rr, temp)
     temp <- calc_quants_ci(df, scenario_set[[ii]], var = epi_vars[[jj]],
-                           t.start = ana_beg, t.end = ana_end,
+                           t.start = ana_beg, t.end = ana_end, mult = 1000,
                            qnt.low = qlow, qnt.high = qhigh, round = 1)
+    rr <- c(rr, temp)
+    if (scenario_set[[ii]] == "base") {
+      temp <- NA
+    } else {
+      if (epi_vars[[jj]] == "hiv_inc") {
+        temp <- calc_quants_ia(df, base.scen = "base",
+                               comp.scen = scenario_set[[ii]], var = epi_vars[[jj]],
+                               t.start = ana_beg, t.end = ana_end, mult = ATL.hiv.neg.n,
+                               qnt.low = 0, qnt.high = 0,
+                               nsims = 1000, round.nia = 0)
+      } else {
+        temp <- calc_quants_ia(df, base.scen = "base",
+                               comp.scen = scenario_set[[ii]], var = epi_vars[[jj]],
+                               t.start = ana_beg, t.end = ana_end, mult = ATL.msm.n,
+                               qnt.low = 0, qnt.high = 0,
+                               nsims = 1000, round.nia = 0)
+      }
+    }
     rr <- c(rr, temp)
   }
   for (kk in 1:length(proc_vars)) {
@@ -89,6 +112,7 @@ for (ii in 1:length(scenario_set)) {
   t1[[ii]] <- rr
 }
 t1 <- as.data.frame(cbind(scenario_set, do.call("rbind", t1)))
+t1
 
 readr::write_csv(t1, "analysis/T1.csv")
 
@@ -119,6 +143,24 @@ for (ii in 1:length(scenario_set)) {
                            t.start = ana_beg, t.end = ana_end,
                            qnt.low = qlow, qnt.high = qhigh, round = 1)
     rr <- c(rr, temp)
+    if (scenario_set[[ii]] == "base") {
+      temp <- NA
+    } else {
+      if (epi_vars[[jj]] == "hiv_inc") {
+        temp <- calc_quants_ia(df, base.scen = "base",
+                               comp.scen = scenario_set[[ii]], var = epi_vars[[jj]],
+                               t.start = ana_beg, t.end = ana_end, mult = ATL.hiv.neg.n,
+                               qnt.low = 0, qnt.high = 0,
+                               nsims = 1000, round.nia = 0)
+      } else {
+        temp <- calc_quants_ia(df, base.scen = "base",
+                               comp.scen = scenario_set[[ii]], var = epi_vars[[jj]],
+                               t.start = ana_beg, t.end = ana_end, mult = ATL.msm.n,
+                               qnt.low = 0, qnt.high = 0,
+                               nsims = 1000, round.nia = 0)
+      }
+    }
+    rr <- c(rr, temp)
   }
   for (kk in 1:length(proc_vars)) {
     temp <- calc_quants_prev(df, scen = scenario_set[[ii]],
@@ -142,8 +184,10 @@ readr::write_csv(t2, "analysis/T2.csv")
 scenario_set <- c("base",
                   "comb_025_025", "comb_025_05", "comb_025_09",
                   "comb_05_025", "comb_05_05", "comb_05_09",
-                  "comb_075_025", "comb_075_05", "comb_075_09",
-                  "comb_09_025", "comb_09_05", "comb_09_09")
+                  "comb_09_025", "comb_09_05", "comb_09_09",
+                  "318_comb_025_025", "318_comb_025_05", "318_comb_025_09",
+                  "318_comb_05_025", "318_comb_05_05", "318_comb_05_09",
+                  "318_comb_09_025", "318_comb_09_05", "318_comb_09_09")
 epi_vars <- c("hiv_inc", "sti_inc", "sti_gc_inc", "sti_ct_inc")
 proc_vars <- c("prep_cov", "hiv_diag", "hiv_suppr", "sti_tx")
 
@@ -161,6 +205,24 @@ for (ii in 1:length(scenario_set)) {
     temp <- calc_quants_ci(df, scenario_set[[ii]], var = epi_vars[[jj]],
                            t.start = ana_beg, t.end = ana_end,
                            qnt.low = qlow, qnt.high = qhigh, round = 1)
+    rr <- c(rr, temp)
+    if (scenario_set[[ii]] == "base") {
+      temp <- NA
+    } else {
+      if (epi_vars[[jj]] == "hiv_inc") {
+        temp <- calc_quants_ia(df, base.scen = "base",
+                               comp.scen = scenario_set[[ii]], var = epi_vars[[jj]],
+                               t.start = ana_beg, t.end = ana_end, mult = ATL.hiv.neg.n,
+                               qnt.low = 0, qnt.high = 0,
+                               nsims = 1000, round.nia = 0)
+      } else {
+        temp <- calc_quants_ia(df, base.scen = "base",
+                               comp.scen = scenario_set[[ii]], var = epi_vars[[jj]],
+                               t.start = ana_beg, t.end = ana_end, mult = ATL.msm.n,
+                               qnt.low = 0, qnt.high = 0,
+                               nsims = 1000, round.nia = 0)
+      }
+    }
     rr <- c(rr, temp)
   }
   for (kk in 1:length(proc_vars)) {
@@ -212,4 +274,4 @@ for (ii in 1:length(scenario_set)) {
 st <- as.data.frame(cbind(scenario_set, do.call("rbind", st)))
 st
 
-readr::write_csv(t3, "analysis/ST-318.csv")
+readr::write_csv(st, "analysis/ST-318.csv")
