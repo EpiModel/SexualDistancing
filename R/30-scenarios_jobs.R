@@ -5,8 +5,8 @@ test_simulation <- FALSE
 # Set slurm parameters ---------------------------------------------------------
 batch_per_set <- 20      # How many 28 replications to do per parameter
 steps_to_keep <- 6 * 52 # Steps to keep in the output df. If NULL, return sim obj
-partition <- "csde"     # On hyak, either ckpt or csde
-job_name <- "SD_3_18"
+partition <- "ckpt"     # On hyak, either ckpt or csde
+job_name <- "SD_comb_3_18"
 ssh_host <- "hyak_mox"
 ssh_dir <- "gscratch/SexualDistancing/"
 
@@ -76,6 +76,8 @@ source("R/utils-scenarios.R")
 ## scenarios <- sens_scenarios
 ## scenarios <- scenarios[grepl("comb_[0-9]+_025", names(scenarios))]
 scenarios <- scenarios_3_18
+scenarios <- scenarios_comb_3_18
+
 
 # Automatic --------------------------------------------------------------------
 #

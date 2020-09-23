@@ -376,57 +376,57 @@ scenarios <- list(
       )
     )
   ),
-  comb_075_025 = list(
-    list(
-      at = step_interv_start,
-      param = list(
-        netresim.form.rr = c(1, 0.25, 0.25),
-        netresim.disl.rr = c(1, 1/0.25),
-        prep.start.prob = param$prep.start.prob * 0.75,
-        prep.discont.rate = param$prep.discont.rate / 0.75,
-        hiv.test.rate = param$hiv.test.rate * 0.75,
-        tx.halt.part.prob = param$tx.halt.part.prob / 0.75,
-        gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.75,
-        gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.75,
-        ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.75,
-        ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.75
-      )
-    )
-  ),
-  comb_075_05 = list(
-    list(
-      at = step_interv_start,
-      param = list(
-        netresim.form.rr = c(1, 0.25, 0.25),
-        netresim.disl.rr = c(1, 1/0.25),
-        prep.start.prob = param$prep.start.prob * 0.5,
-        prep.discont.rate = param$prep.discont.rate / 0.5,
-        hiv.test.rate = param$hiv.test.rate * 0.5,
-        tx.halt.part.prob = param$tx.halt.part.prob / 0.5,
-        gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.5,
-        gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.5,
-        ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.5,
-        ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.5
-      )
-    )
-  ),
-  comb_075_09 = list(
-    list(
-      at = step_interv_start,
-      param = list(
-        netresim.form.rr = c(1, 0.25, 0.25),
-        netresim.disl.rr = c(1, 1/0.25),
-        prep.start.prob = param$prep.start.prob * 0.1,
-        prep.discont.rate = param$prep.discont.rate / 0.1,
-        hiv.test.rate = param$hiv.test.rate * 0.1,
-        tx.halt.part.prob = param$tx.halt.part.prob / 0.1,
-        gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.1,
-        gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.1,
-        ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.1,
-        ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.1
-      )
-    )
-  ),
+  ## comb_075_025 = list(
+  ##   list(
+  ##     at = step_interv_start,
+  ##     param = list(
+  ##       netresim.form.rr = c(1, 0.25, 0.25),
+  ##       netresim.disl.rr = c(1, 1/0.25),
+  ##       prep.start.prob = param$prep.start.prob * 0.75,
+  ##       prep.discont.rate = param$prep.discont.rate / 0.75,
+  ##       hiv.test.rate = param$hiv.test.rate * 0.75,
+  ##       tx.halt.part.prob = param$tx.halt.part.prob / 0.75,
+  ##       gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.75,
+  ##       gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.75,
+  ##       ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.75,
+  ##       ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.75
+  ##     )
+  ##   )
+  ## ),
+  ## comb_075_05 = list(
+  ##   list(
+  ##     at = step_interv_start,
+  ##     param = list(
+  ##       netresim.form.rr = c(1, 0.25, 0.25),
+  ##       netresim.disl.rr = c(1, 1/0.25),
+  ##       prep.start.prob = param$prep.start.prob * 0.5,
+  ##       prep.discont.rate = param$prep.discont.rate / 0.5,
+  ##       hiv.test.rate = param$hiv.test.rate * 0.5,
+  ##       tx.halt.part.prob = param$tx.halt.part.prob / 0.5,
+  ##       gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.5,
+  ##       gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.5,
+  ##       ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.5,
+  ##       ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.5
+  ##     )
+  ##   )
+  ## ),
+  ## comb_075_09 = list(
+  ##   list(
+  ##     at = step_interv_start,
+  ##     param = list(
+  ##       netresim.form.rr = c(1, 0.25, 0.25),
+  ##       netresim.disl.rr = c(1, 1/0.25),
+  ##       prep.start.prob = param$prep.start.prob * 0.1,
+  ##       prep.discont.rate = param$prep.discont.rate / 0.1,
+  ##       hiv.test.rate = param$hiv.test.rate * 0.1,
+  ##       tx.halt.part.prob = param$tx.halt.part.prob / 0.1,
+  ##       gc.sympt.prob.tx = param$gc.sympt.prob.tx * 0.1,
+  ##       gc.asympt.prob.tx = param$gc.asympt.prob.tx * 0.1,
+  ##       ct.sympt.prob.tx = param$ct.sympt.prob.tx * 0.1,
+  ##       ct.asympt.prob.tx = param$ct.asympt.prob.tx * 0.1
+  ##     )
+  ##   )
+  ## ),
   comb_09_025 = list(
     list(
       at = step_interv_start,
@@ -502,7 +502,7 @@ sens_end_ser <- list(
   )
 )
 
-mk_sens_scenar <- function(at_net, at_ser) {
+mk_sens_scenar <- function(sens_base, at_net, at_ser) {
   ll <- list(sens_base, sens_end_net, sens_end_ser)
   ll[[2]]$at <- ll[[2]]$at + at_net / 12 * 52
   ll[[3]]$at <- ll[[3]]$at + at_ser / 12 * 52
@@ -513,7 +513,7 @@ dts <- purrr::cross(list(seq(0, 18, 3), seq(0, 18, 3)))
 dts <- purrr::transpose(dts)
 dts <- purrr::map(dts, as.numeric)
 
-sens_scenarios <- purrr::pmap(dts, ~ mk_sens_scenar(..1, ..2))
+sens_scenarios <- purrr::pmap(dts, ~ mk_sens_scenar(sens_base, ..1, ..2))
 
 names(sens_scenarios) <- purrr::pmap_chr(dts, ~ paste0("sensi_net", ..1, "_ser", ..2))
 
@@ -525,3 +525,7 @@ scenarios_3_18 <- sens_scenarios[names(sens_scenarios) %in% c("sensi_net0_ser0",
 
 
 names(scenarios_3_18) <- c("base_318", "net_only_318", "ser_only_318", "comb_318")
+
+combs <- names(scenarios)[grepl("comb_", names(scenarios))]
+scenarios_comb_3_18 <- purrr::map(combs, ~mk_sens_scenar(scenarios[[.x]][[1]], 3, 18))
+names(scenarios_comb_3_18) <- purrr::map(combs, ~ paste0("318_", .x))
