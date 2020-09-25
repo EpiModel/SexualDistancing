@@ -88,14 +88,14 @@ for (ii in 1:length(scenario_set)) {
         temp <- calc_quants_ia(df, base.scen = "base",
                                comp.scen = scenario_set[[ii]], var = epi_vars[[jj]],
                                t.start = ana_beg, t.end = ana_end, mult = ATL.hiv.neg.n,
-                               qnt.low = 0, qnt.high = 0,
+                               qnt.low = qlow, qnt.high = qhigh,
                                nsims = 1000, round.nia = 0)
       } else {
         temp <- calc_quants_ia(df, base.scen = "base",
                                comp.scen = scenario_set[[ii]], var = epi_vars[[jj]],
-                               t.start = ana_beg, t.end = ana_end, mult = ATL.msm.n,
-                               qnt.low = 0, qnt.high = 0,
-                               nsims = 1000, round.nia = 0)
+                               t.start = ana_beg, t.end = ana_end, mult = ATL.msm.n/1000,
+                               qnt.low = qlow, qnt.high = qhigh,
+                               nsims = 1000, round.nia = 1)
       }
     }
     rr <- c(rr, temp)
@@ -150,14 +150,14 @@ for (ii in 1:length(scenario_set)) {
         temp <- calc_quants_ia(df, base.scen = "base",
                                comp.scen = scenario_set[[ii]], var = epi_vars[[jj]],
                                t.start = ana_beg, t.end = ana_end, mult = ATL.hiv.neg.n,
-                               qnt.low = 0, qnt.high = 0,
+                               qnt.low = qlow, qnt.high = qhigh,
                                nsims = 1000, round.nia = 0)
       } else {
         temp <- calc_quants_ia(df, base.scen = "base",
                                comp.scen = scenario_set[[ii]], var = epi_vars[[jj]],
-                               t.start = ana_beg, t.end = ana_end, mult = ATL.msm.n,
-                               qnt.low = 0, qnt.high = 0,
-                               nsims = 1000, round.nia = 0)
+                               t.start = ana_beg, t.end = ana_end, mult = ATL.msm.n/1000,
+                               qnt.low = qlow, qnt.high = qhigh,
+                               nsims = 1000, round.nia = 1)
       }
     }
     rr <- c(rr, temp)
@@ -213,14 +213,14 @@ for (ii in 1:length(scenario_set)) {
         temp <- calc_quants_ia(df, base.scen = "base",
                                comp.scen = scenario_set[[ii]], var = epi_vars[[jj]],
                                t.start = ana_beg, t.end = ana_end, mult = ATL.hiv.neg.n,
-                               qnt.low = 0, qnt.high = 0,
+                               qnt.low = qlow, qnt.high = qhigh,
                                nsims = 1000, round.nia = 0)
       } else {
         temp <- calc_quants_ia(df, base.scen = "base",
                                comp.scen = scenario_set[[ii]], var = epi_vars[[jj]],
-                               t.start = ana_beg, t.end = ana_end, mult = ATL.msm.n,
-                               qnt.low = 0, qnt.high = 0,
-                               nsims = 1000, round.nia = 0)
+                               t.start = ana_beg, t.end = ana_end, mult = ATL.msm.n/1000,
+                               qnt.low = qlow, qnt.high = qhigh,
+                               nsims = 1000, round.nia = 1)
       }
     }
     rr <- c(rr, temp)
