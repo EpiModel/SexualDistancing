@@ -3,6 +3,6 @@ if (dir.exists("renv/")) {
   if (interactive()) {
     renv::status()
   }
+} else {
+  cat("* Run renv::init() to install the R packages for this project")
 }
-
-
