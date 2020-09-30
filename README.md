@@ -6,7 +6,7 @@ Description
 
 > Citation
 
-<img src="https://github.com/EpiModel/CombPrev/raw/master/analysis/fig/Figure2.png">
+<img src="https://github.com/EpiModel/CombPrev/raw/master/analysis/Fig1.png">
 
 ## Abstract
 
@@ -22,7 +22,7 @@ Text
 #### Conclusions 	
 Text
 
-<img src="https://github.com/EpiModel/CombPrev/raw/master/analysis/fig/Figure3.png">
+<img src="https://github.com/EpiModel/CombPrev/raw/master/analysis/Fig2.jpg">
 
 ## Model Code
 
@@ -59,6 +59,3 @@ or in "~/.Renviron":
 GITHUB_PAT="<your github private access token>"
 
 ```
-
-
-
