@@ -6,7 +6,7 @@ Description
 
 > Citation
 
-<img src="https://github.com/EpiModel/CombPrev/raw/master/analysis/Fig1.png">
+<img src="https://github.com/EpiModel/CombPrev/raw/master/analysis/Fig1.jpg">
 
 ## Abstract
 
