@@ -6,7 +6,7 @@ Description
 
 > Citation
 
-<img src="https://github.com/EpiModel/CombPrev/raw/master/analysis/Fig1.jpg">
+<img src="https://github.com/EpiModel/SexualDistancing/raw/master/analysis/Fig1.jpg">
 
 ## Abstract
 
@@ -22,7 +22,7 @@ Text
 #### Conclusions 	
 Text
 
-<img src="https://github.com/EpiModel/CombPrev/raw/master/analysis/Fig2.jpg">
+<img src="https://github.com/EpiModel/SexualDistancing/raw/master/analysis/Fig2.jpg">
 
 ## Model Code
 
