@@ -26,8 +26,7 @@ The counterbalancing impact of sexual distancing and clinical service interrupti
 
 ## Model Code
 
-These models are written and executed in the R statistical software language. To run these files, it is necessary to use the correct version of our epidemic 
-modeling software, [EpiModel](http://epimodel.org/), and our extension package specifically for modeling HIV/STI transmission dynamics among MSM,
+These models are written and executed in the R statistical software language. To run these files, it is necessary to use the correct version of our epidemic modeling software, [EpiModel](http://epimodel.org/), and our extension package specifically for modeling HIV/STI transmission dynamics among MSM,
 [EpiModelHIV](http://github.com/statnet/EpiModelHIV).
 
 In R, load the necessary packages with the following command:
