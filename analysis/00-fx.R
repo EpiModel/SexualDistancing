@@ -17,7 +17,7 @@ create_var_df <- function(df, scen, var) {
 
 create_quants_df <- function(df, low = 0.25, high = 0.75) {
   df <- select(df, -time)
-  out <- t(apply(df, 1, quantile, c(0.5, low, high)))
+  out <- t(apply(df, 1, quantile, c(0.5, low, high), TRUE))
   return(out)
 }
 
@@ -30,6 +30,7 @@ draw_quants <- function(x, col) {
 apply_roll <- function(x, n) {
   for (j in 1:ncol(x)) {
     x[, j] <- RcppRoll::roll_meanr(x[, j], n = n)
+    x[1:(n - 1), j] <- x[n, j]
   }
   return(x)
 }

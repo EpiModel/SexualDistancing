@@ -38,37 +38,37 @@ par(mfrow = c(1,2))
 
 ## HIV panel
 var <- "hiv_inc"
-roll <- 8
+roll <- 10
 
 scen <- "ser_all_05"
 h1 <- create_var_df(df, scen, var)
-h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
-h3 <- apply_roll(h2, roll)
-plot(h3[, 1], type = "l", ylim = c(0, 5), col = 2, lwd = 2, lty = 1,
+h2 <- apply_roll(h1, roll)
+h3 <- create_quants_df(h2, low = 0.25, high = 0.75)
+plot(h3[, 1], type = "l", ylim = c(0, 5), col = 2, lwd = 1.5, lty = 1,
      xlab = "Week", ylab = "HIV Incidence per 100 PYAR",
      main = "A. HIV")
 draw_quants(h3, col = adjustcolor(2, alpha.f = 0.1))
-abline(v = int_beg-ana_beg, lty = 3, lwd = 2)
-abline(v = int_end-ana_beg, lty = 3, lwd = 2)
+abline(v = int_beg-ana_beg, lty = 3, lwd = 1.5)
+abline(v = int_end-ana_beg, lty = 3, lwd = 1.5)
 
 h1 <- create_var_df(df, scen = "base", var)
-h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
-h3 <- apply_roll(h2, roll)
-lines(h3[, 1], type = "l", col = 1, lwd = 2)
+h2 <- apply_roll(h1, roll)
+h3 <- create_quants_df(h2, low = 0.25, high = 0.75)
+lines(h3[, 1], type = "l", col = 1, lwd = 1.5)
 draw_quants(h3, col = adjustcolor(1, alpha.f = 0.1))
 
 scen <- "net_all_05"
-h1 <- create_var_df(df, scen = scen, var)
-h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
-h3 <- apply_roll(h2, roll)
-lines(h3[, 1], type = "l", col = 3, lwd = 2, lty = 1)
+h1 <- create_var_df(df, scen, var)
+h2 <- apply_roll(h1, roll)
+h3 <- create_quants_df(h2, low = 0.25, high = 0.75)
+lines(h3[, 1], type = "l", col = 3, lwd = 1.5, lty = 1)
 draw_quants(h3, col = adjustcolor(3, alpha.f = 0.1))
 
 scen <- "comb_05_05"
-h1 <- create_var_df(df, scen = scen, var)
-h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
-h3 <- apply_roll(h2, roll)
-lines(h3[, 1], type = "l", col = 4, lwd = 2, lty = 2)
+h1 <- create_var_df(df, scen, var)
+h2 <- apply_roll(h1, roll)
+h3 <- create_quants_df(h2, low = 0.25, high = 0.75)
+lines(h3[, 1], type = "l", col = 4, lwd = 1.5, lty = 1)
 draw_quants(h3, col = adjustcolor(4, alpha.f = 0.1))
 
 text(23, 4.9, "COVID Start", cex = 0.95)
@@ -77,37 +77,37 @@ text(97, 4.9, "Sex & Services\nResume", cex = 0.95)
 ## STI panel
 
 var <- "sti_inc"
-roll <- 4
+roll <- 2
 
 scen <- "ser_all_05"
 h1 <- create_var_df(df, scen, var)
-h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
-h3 <- apply_roll(h2, roll)
-plot(h3[, 1], type = "l", ylim = c(0, 100), col = 2, lwd = 2,
+h2 <- apply_roll(h1, roll)
+h3 <- create_quants_df(h2, low = 0.25, high = 0.75)
+plot(h3[, 1], type = "l", ylim = c(0, 100), col = 2, lwd = 1.5,
      xlab = "Week", ylab = "STI Incidence per 100 PYAR",
      main = "B. Combined STI")
 draw_quants(h3, col = adjustcolor(2, alpha.f = 0.1))
-abline(v = int_beg-ana_beg, lty = 3, lwd = 2)
-abline(v = int_end-ana_beg, lty = 3, lwd = 2)
+abline(v = int_beg-ana_beg, lty = 3, lwd = 1.5)
+abline(v = int_end-ana_beg, lty = 3, lwd = 1.5)
 
 h1 <- create_var_df(df, scen = "base", var)
-h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
-h3 <- apply_roll(h2, roll)
-lines(h3[, 1], type = "l", col = 1, lwd = 2)
+h2 <- apply_roll(h1, roll)
+h3 <- create_quants_df(h2, low = 0.25, high = 0.75)
+lines(h3[, 1], type = "l", col = 1, lwd = 1.5)
 draw_quants(h3, col = adjustcolor(1, alpha.f = 0.1))
 
 scen <- "net_all_05"
-h1 <- create_var_df(df, scen = scen, var)
-h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
-h3 <- apply_roll(h2, roll)
-lines(h3[, 1], type = "l", col = 3, lwd = 2)
+h1 <- create_var_df(df, scen, var)
+h2 <- apply_roll(h1, roll)
+h3 <- create_quants_df(h2, low = 0.25, high = 0.75)
+lines(h3[, 1], type = "l", col = 3, lwd = 1.5)
 draw_quants(h3, col = adjustcolor(3, alpha.f = 0.1))
 
 scen <- "comb_05_05"
-h1 <- create_var_df(df, scen = scen, var)
-h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
-h3 <- apply_roll(h2, roll)
-lines(h3[, 1], type = "l", col = 4, lwd = 2, lty = 2)
+h1 <- create_var_df(df, scen, var)
+h2 <- apply_roll(h1, roll)
+h3 <- create_quants_df(h2, low = 0.25, high = 0.75)
+lines(h3[, 1], type = "l", col = 4, lwd = 1.5, lty = 1)
 draw_quants(h3, col = adjustcolor(4, alpha.f = 0.1))
 
 legend("topright",
@@ -130,38 +130,39 @@ table(df$scenario)
 
 ## HIV panel
 var <- "hiv_inc"
-roll <- 8
+roll <- 10
 
 scen <- "ser_only_318"
 h1 <- create_var_df(df, scen, var)
-h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
-h3 <- apply_roll(h2, roll)
-plot(h3[, 1], type = "l", ylim = c(0, 5), col = 2, lwd = 2, lty = 1,
+h2 <- apply_roll(h1, roll)
+h3 <- create_quants_df(h2, low = 0.25, high = 0.75)
+plot(h3[, 1], type = "l", ylim = c(0, 5), col = 2, lwd = 1.5, lty = 1,
      xlab = "Week", ylab = "HIV Incidence per 100 PYAR",
      main = "A. HIV")
 draw_quants(h3, col = adjustcolor(2, alpha.f = 0.1))
-abline(v = int_beg-ana_beg, lty = 3, lwd = 2)
-abline(v = int_end-ana_beg, lty = 3, col = 2, lwd = 2)
-abline(v = int_beg-ana_beg+(3*4), lty = 3, col = 3, lwd = 2)
+abline(v = int_beg-ana_beg, lty = 3, lwd = 1.5)
+abline(v = int_end-ana_beg, lty = 3, col = 2, lwd = 1.5)
+abline(v = int_beg-ana_beg+(3*4), lty = 3, col = 3, lwd = 1.5)
 
-h1 <- create_var_df(df, scen = "base_318", var)
-h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
-h3 <- apply_roll(h2, roll)
-lines(h3[, 1], type = "l", col = 1, lwd = 2)
+scen <- "base_318"
+h1 <- create_var_df(df, scen, var)
+h2 <- apply_roll(h1, roll)
+h3 <- create_quants_df(h2, low = 0.25, high = 0.75)
+lines(h3[, 1], type = "l", col = 1, lwd = 1.5)
 draw_quants(h3, col = adjustcolor(1, alpha.f = 0.1))
 
 scen <- "net_only_318"
-h1 <- create_var_df(df, scen = scen, var)
-h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
-h3 <- apply_roll(h2, roll)
-lines(h3[, 1], type = "l", col = 3, lwd = 2, lty = 2)
+h1 <- create_var_df(df, scen, var)
+h2 <- apply_roll(h1, roll)
+h3 <- create_quants_df(h2, low = 0.25, high = 0.75)
+lines(h3[, 1], type = "l", col = 3, lwd = 1.5, lty = 1)
 draw_quants(h3, col = adjustcolor(3, alpha.f = 0.1))
 
 scen <- "comb_318"
-h1 <- create_var_df(df, scen = scen, var)
-h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
-h3 <- apply_roll(h2, roll)
-lines(h3[, 1], type = "l", col = 4, lwd = 2, lty = 1)
+h1 <- create_var_df(df, scen, var)
+h2 <- apply_roll(h1, roll)
+h3 <- create_quants_df(h2, low = 0.25, high = 0.75)
+lines(h3[, 1], type = "l", col = 4, lwd = 1.5, lty = 1)
 draw_quants(h3, col = adjustcolor(4, alpha.f = 0.1))
 
 text(23, 4.9, "COVID Start", cex = 0.95)
@@ -176,34 +177,35 @@ roll <- 4
 
 scen <- "ser_only_318"
 h1 <- create_var_df(df, scen, var)
-h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
-h3 <- apply_roll(h2, roll)
-plot(h3[, 1], type = "l", ylim = c(0, 100), col = 2, lwd = 2,
+h2 <- apply_roll(h1, roll)
+h3 <- create_quants_df(h2, low = 0.25, high = 0.75)
+plot(h3[, 1], type = "l", ylim = c(0, 100), col = 2, lwd = 1.5,
      xlab = "Week", ylab = "STI Incidence per 100 PYAR",
      main = "B. Combined STI")
 draw_quants(h3, col = adjustcolor(2, alpha.f = 0.1))
-abline(v = int_beg-ana_beg, lty = 3, lwd = 2)
-abline(v = int_end-ana_beg, lty = 3, col = 2, lwd = 2)
-abline(v = int_beg-ana_beg+(3*4), lty = 3, col = 3, lwd = 2)
+abline(v = int_beg-ana_beg, lty = 3, lwd = 1.5)
+abline(v = int_end-ana_beg, lty = 3, col = 2, lwd = 1.5)
+abline(v = int_beg-ana_beg+(3*4), lty = 3, col = 3, lwd = 1.5)
 
-h1 <- create_var_df(df, scen = "base_318", var)
-h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
-h3 <- apply_roll(h2, roll)
-lines(h3[, 1], type = "l", col = 1, lwd = 2)
+scen <- "base_318"
+h1 <- create_var_df(df, scen, var)
+h2 <- apply_roll(h1, roll)
+h3 <- create_quants_df(h2, low = 0.25, high = 0.75)
+lines(h3[, 1], type = "l", col = 1, lwd = 1.5)
 draw_quants(h3, col = adjustcolor(1, alpha.f = 0.1))
 
 scen <- "net_only_318"
-h1 <- create_var_df(df, scen = scen, var)
-h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
-h3 <- apply_roll(h2, roll)
-lines(h3[, 1], type = "l", col = 3, lwd = 2, lty = 2)
+h1 <- create_var_df(df, scen, var)
+h2 <- apply_roll(h1, roll)
+h3 <- create_quants_df(h2, low = 0.25, high = 0.75)
+lines(h3[, 1], type = "l", col = 3, lwd = 1.5, lty = 1)
 draw_quants(h3, col = adjustcolor(3, alpha.f = 0.1))
 
 scen <- "comb_318"
-h1 <- create_var_df(df, scen = scen, var)
-h2 <- create_quants_df(h1, low = 0.25, high = 0.75)
-h3 <- apply_roll(h2, roll)
-lines(h3[, 1], type = "l", col = 4, lwd = 2, lty = 1)
+h1 <- create_var_df(df, scen, var)
+h2 <- apply_roll(h1, roll)
+h3 <- create_quants_df(h2, low = 0.25, high = 0.75)
+lines(h3[, 1], type = "l", col = 4, lwd = 1.5, lty = 1)
 draw_quants(h3, col = adjustcolor(4, alpha.f = 0.1))
 
 legend("topright",
