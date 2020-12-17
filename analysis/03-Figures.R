@@ -71,8 +71,8 @@ h3 <- create_quants_df(h2, low = 0.25, high = 0.75)
 lines(h3[, 1], type = "l", col = 4, lwd = 1.25, lty = 1)
 draw_quants(h3, col = adjustcolor(4, alpha.f = 0.1))
 
-text(23, 4.9, "COVID Start", cex = 0.95)
-text(97, 4.9, "Sex & Services\nResume", cex = 0.95)
+text(23, 4.9, "COVID Start", cex = 0.85)
+text(93, 4.9, "Distancing Ends\n& Services Resume", cex = 0.85)
 
 ## STI panel
 
@@ -85,7 +85,7 @@ h2 <- apply_roll(h1, roll)
 h3 <- create_quants_df(h2, low = 0.25, high = 0.75)
 plot(h3[, 1], type = "l", ylim = c(0, 100), col = 2, lwd = 1.25,
      xlab = "Week", ylab = "STI Incidence per 100 PYAR",
-     main = "B. Combined STI")
+     main = "B. Combined STI (NG and CT)")
 draw_quants(h3, col = adjustcolor(2, alpha.f = 0.1))
 abline(v = int_beg-ana_beg, lty = 3, lwd = 1.25)
 abline(v = int_end-ana_beg, lty = 3, lwd = 1.25)
@@ -165,9 +165,9 @@ h3 <- create_quants_df(h2, low = 0.25, high = 0.75)
 lines(h3[, 1], type = "l", col = 4, lwd = 1.25, lty = 1)
 draw_quants(h3, col = adjustcolor(4, alpha.f = 0.1))
 
-text(23, 4.9, "COVID Start", cex = 0.95)
-text(95, 4.9, "Sex Resumes", col = 3, cex = 0.95)
-text(152, 4.9, "Services\nResume", col = 2, cex = 0.95)
+text(23, 4.9, "COVID Start", cex = 0.85)
+text(88, 4.9, "Distancing\nEnds", col = 3, cex = 0.85)
+text(152, 4.9, "Services\nResume", col = 2, cex = 0.85)
 
 
 ## STI panel
@@ -181,7 +181,7 @@ h2 <- apply_roll(h1, roll)
 h3 <- create_quants_df(h2, low = 0.25, high = 0.75)
 plot(h3[, 1], type = "l", ylim = c(0, 100), col = 2, lwd = 1.25,
      xlab = "Week", ylab = "STI Incidence per 100 PYAR",
-     main = "B. Combined STI")
+     main = "B. Combined STI (NG and CT)")
 draw_quants(h3, col = adjustcolor(2, alpha.f = 0.1))
 abline(v = int_beg-ana_beg, lty = 3, lwd = 1.25)
 abline(v = int_end-ana_beg, lty = 3, col = 2, lwd = 1.25)
@@ -265,10 +265,10 @@ dfs1 %>%
   xlab("Service Interruption Duration (Months)") +
   theme_light() +
   theme(
-    aspect.ratio = 1/4,
     strip.background = element_rect(fill = "black"),
     legend.margin = margin(0, 0, -5, 0),
-    legend.position = "top"
+    legend.position = "top",
+    aspect.ratio = 1/4,
   ) +
   guides(fill = guide_legend(
     title.position = "left",
