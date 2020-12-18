@@ -279,7 +279,9 @@ dfs1 %>%
   ))
 dfs1
 
-ggsave("analysis/Fig2.pdf", device = "pdf", height = 6, width = 12, units = "in")
+# ggsave("analysis/Fig2.pdf", device = "pdf", height = 6, width = 12, units = "in")
+ggsave("analysis/Fig2.tiff", device = "tiff", height = 6, width = 12, units = "in", dpi = 500)
+
 
 head(dfs1)
 d318 <- filter(dfs1, net == 3 & ser == 18)
