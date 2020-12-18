@@ -9,3 +9,5 @@ analysis/data/
 *.html
 renv/
 out/est/
+
+analysis/*.tiff

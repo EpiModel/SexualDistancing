@@ -31,7 +31,8 @@ df <- readRDS("~/data/SexDist/df.rds")
 df <- filter(df, time >= ana_beg)
 table(df$scenario)
 
-pdf("analysis/Fig1.pdf", height = 6, width = 12)
+# pdf("analysis/Fig1.pdf", height = 6, width = 12)
+tiff("analysis/Fig1.tiff", height = 6, width = 12, units = "in", res = 500)
 
 par(mar = c(3,3,2,1), mgp = c(2,1,0))
 par(mfrow = c(1,2))
@@ -119,7 +120,8 @@ dev.off()
 
 ## 50-50 Scenario + 3 month distancing
 
-pdf("analysis/Fig3.pdf", height = 6, width = 12)
+# pdf("analysis/Fig3.pdf", height = 6, width = 12)
+tiff("analysis/Fig3.tiff", height = 6, width = 12, units = "in", res = 500)
 
 par(mar = c(3,3,2,1), mgp = c(2,1,0))
 par(mfrow = c(1,2))
