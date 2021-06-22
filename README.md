@@ -4,7 +4,7 @@ This repository holds the source to code to reproduce the analysis featured in o
 
 ## Citation
 
-> Jenness SM, Le Guillou A, Chandra C, Mann L, Sanchez T, Westreich D, Marcus JL. Projected HIV and Bacterial STI Incidence Following COVID-Related Sexual Distancing and Clinical Service Interruption. Journal of Infectious Diseases. 2021; 223(6): 1019–28. [[LINK]](https://doi.org/10.1093/infdis/jiab051)
+> Jenness SM, Le Guillou A, Chandra C, Mann L, Sanchez T, Westreich D, Marcus JL. Projected HIV and Bacterial STI Incidence Following COVID-Related Sexual Distancing and Clinical Service Interruption. _Journal of Infectious Diseases._ 2021; 223(6): 1019–28. [[LINK]](https://doi.org/10.1093/infdis/jiab051)
 
 <img src="https://github.com/EpiModel/SexualDistancing/raw/master/analysis/Fig1.jpg">
 
